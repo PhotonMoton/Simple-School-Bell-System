@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Python Flask ReplAuth</title>
+    <script src="https://replit.com/public/js/repl-auth-v2.js"></script>
+</head>
+
+<body>
+    <h1>DAY: {{ daySong }}</h1>
+    <h1>END: {{ endSong }}</h1>
+    <form method="post" enctype="multipart/form-data" action="/upload">
+        <label for="file">Choose a file:</label>
+        <input type="file" name="file" id="file" accept=".mp3">
+        <select id="dropdown" name="selectedOption">
+            <option value="day">DAY</option>
+            <option value="end">END</option>
+        </select>
+        <input type="submit" value="Upload">
+    </form>
+    <form method="post" action="/start">
+        <input type="submit" value="Start">
+    </form>
+    <form method="post" action="/stop">
+        <input type="submit" value="Stop">
+    </form>
+
+    {% if audio_on %}
+        <div>Program is running!</div>
+    {% else %}
+        <div>Program is off!</div>
+    {% endif %}
+</body>
+
+</html>
