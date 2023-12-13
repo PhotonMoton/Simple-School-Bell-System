@@ -24,6 +24,15 @@ This project is designed to automate the school bell system using a Raspberry Pi
    ```
 3. If prompted, enter your password.
 
+### Transfer or Download Files
+
+1. Download and extract all the files onto your Raspberry Pi
+
+2. You may need to transfer files over to the Raspberry Pi.  If so you can download the files as a zip.  Then you can transfer them like so:
+    ```
+    scp path/to/file admin@raspberrypi.local:/path/to/destination
+    ```
+
 **Note**
 You can replace "admin" with whatever the account is that is running the script on the Raspberry Pi.
 
@@ -31,7 +40,7 @@ You can replace "admin" with whatever the account is that is running the script 
 
 1. Change the directory to the app:
    ```
-   cd /Desktop/SchoolBell/
+   cd /Directory/To/APP
    ```
 
 2. Start the virtual environment:
