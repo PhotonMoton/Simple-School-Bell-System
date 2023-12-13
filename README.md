@@ -1,4 +1,4 @@
-# School Bell Automation System
+# Simple School Bell System (SSBS)
 
 ## Introduction
 
