@@ -22,18 +22,10 @@ def index():
     global endSong
     global audio_process
 
-    if audio_process is None or not audio_process.is_alive():
-        # Clear the stop event to allow the audio player to run
-        stop_audio_event.clear()
-
-        # Start a new process for the audio player
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-        audio_process.start()
-
-    # Retrieve the path to the 'static' folder within the app
+    # Retrieve the path to the 'day' folder within the app
     day_folder_path = os.path.join(app.root_path, 'static', 'day')
 
-    # Get a list of files in the 'static' folder
+    # Get a list of files in the 'day' folder
     files_in_folder = os.listdir(day_folder_path)
 
     if files_in_folder:
@@ -41,10 +33,10 @@ def index():
         for file in files_in_folder:
             daySong = os.path.basename(file)
 
-    # Retrieve the path to the 'static' folder within the app
+    # Retrieve the path to the 'end' folder within the app
     end_folder_path = os.path.join(app.root_path, 'static', 'end')
 
-    # Get a list of files in the 'static' folder
+    # Get a list of files in the 'end' folder
     files_in_folder = os.listdir(end_folder_path)
 
     if files_in_folder:
@@ -52,11 +44,16 @@ def index():
         for file in files_in_folder:
             endSong = os.path.basename(file)
 
-        # Render the index.html template with the last file as the current song
-        return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
-    else:
-        # Render the index.html template with the default 'test' song if no files are present
-        return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+        if audio_process is None or not audio_process.is_alive():
+            # Clear the stop event to allow the audio player to run
+            stop_audio_event.clear()
+
+            # Start a new process for the audio player
+            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+            audio_process.start()
+    # Render the index.html template with the last files saved as the current song
+    return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+
 
 # Route to handle file uploads
 @app.route('/upload', methods=['POST', 'GET'])
