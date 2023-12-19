@@ -1,5 +1,5 @@
 import os
-from pydub import AudioSegment
+import pydub
 
 def createSchedule():
   schedule = [
