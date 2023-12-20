@@ -1,5 +1,5 @@
 import os
-import pydub
+from pydub import AudioSegment
 
 def createSchedule():
   schedule = [
@@ -44,10 +44,4 @@ def cut_audio(input_path, output_path, start_time, end_time):
     new_audio = audio[start_time * 1000:end_time * 1000]
     new_audio.export(output_path, format="mp3")
 
-# Example usage
-input_audio_path = "path/to/input/audio.mp3"
-output_audio_path = "path/to/output/cut_audio.mp3"
-start_time_seconds = 10
-end_time_seconds = 20
 
-cut_audio(input_audio_path, output_audio_path, start_time_seconds, end_time_seconds)

@@ -7,7 +7,7 @@ This project is designed to automate the school bell system using a Raspberry Pi
 ## Getting Started
 
 ### Connect to Raspberry Pi
-1. Ensure that your Raspberry Pi is powered on and connected to the internet.
+1. Ensure that your Raspberry Pi is powered on and connected to the internet. (This may recquire )
 
 #### Windows (using Cygwin):
 1. Open Cygwin or any other Unix CLI Emulator.
@@ -43,7 +43,7 @@ You can replace "admin" with whatever the account is that is running the script 
    cd /path/to/your/SchoolBell/
    ```
 
-2. Start the virtual environment:
+2. Start the virtual environment. Enter:
    ```
    . .venv/bin/activate
    ```
@@ -138,7 +138,15 @@ To ensure that the School Bell Management System runs automatically on boot, fol
     ```
 
    **Note**
-   Make sure to replace `/path/to/your/SchoolBell` with the actual path to your School Bell System and `User=` with the account running the service.
+   Make sure to replace `/path/to/your/SchoolBell` with the actual path to your School Bell System and `User=` with the account running the service.  
+   You also may have to manually set the host address in the `main.py` file to ensure that the program is served correctly.
+    
+    ```
+    if __name__ == "__main__":
+       app.run(host='0.0.0.0', port=8080)
+    ```
+
+    Just replace `0.0.0.0` with the address you want the app to service. Most probably it will be the local address of the Raspberry Pi.
 
 5. Save the file and exit the text editor.
 
