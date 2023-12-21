@@ -1,5 +1,6 @@
 import os
 from pydub import AudioSegment
+from datetime import datetime
 
 def createSchedule():
   schedule = [
@@ -38,10 +39,25 @@ def delete_files_in_folder(folder_path):
           print(f"Error deleting {file_path}: {e}")
 
 
-
-def cut_audio(input_path, output_path, start_time, end_time):
-    audio = AudioSegment.from_file(input_path)
+# Edit a audio file to cut out a segment designated by a start and end time
+def cut_audio(file_path, start_time, end_time):
+    audio = AudioSegment.from_file(file_path)
     new_audio = audio[start_time * 1000:end_time * 1000]
-    new_audio.export(output_path, format="mp3")
+    new_audio.export(file_path, format="mp3")
 
+
+# Convert HH:MM:SS time format into seconds
+def time_to_seconds(time_str):
+    try:
+        # Parse the input time string into a datetime object
+        time_obj = datetime.strptime(time_str, '%H:%M:%S').time()
+        
+        # Calculate the total seconds from the time object
+        seconds = time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second
+        
+        return seconds
+    
+    except ValueError:
+        # Handle the case where the input time format is invalid
+        return "error"
 

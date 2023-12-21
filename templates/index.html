@@ -16,6 +16,8 @@
             <option value="day">DAY</option>
             <option value="end">END</option>
         </select>
+        <label for="startTime">Start Time:</label>
+        <input type="text" name="start_time" id="start_time" placeholder="HH:MM:SS">
         <input type="submit" value="Upload">
     </form>
     <form method="post" action="/start">
@@ -29,6 +31,9 @@
         <div>Program is running!</div>
     {% else %}
         <div>Program is off!</div>
+    {% endif %}
+    {% if error %}
+        <div>"Invalid time format. Please enter the time in HH:MM:SS format."</div>
     {% endif %}
 </body>
 
