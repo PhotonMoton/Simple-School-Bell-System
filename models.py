@@ -48,6 +48,9 @@ def cut_audio(file_path, start_time, end_time):
 
 # Convert HH:MM:SS time format into seconds
 def time_to_seconds(time_str):
+    if time_str == "":
+        return 0
+
     try:
         # Parse the input time string into a datetime object
         time_obj = datetime.strptime(time_str, '%H:%M:%S').time()

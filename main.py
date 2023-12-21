@@ -62,6 +62,7 @@ def upload_file():
     global stop_audio_event
     global audio_process
     songSubFolder = 'day'  # Default subfolder for songs
+    start_time_seconds = 0
 
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -71,8 +72,9 @@ def upload_file():
         file = request.files['file']
         songSubFolder = request.form.get('selectedOption')
         start_time_seconds = time_to_seconds(request.form.get('start_time'))
-        if(start_time_seconds == "error"):
+        if start_time_seconds == "error":
             return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive(), error=True)
+        
         end_time_seconds = start_time_seconds+45
         
         if file.filename == '':

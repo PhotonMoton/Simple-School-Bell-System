@@ -7,7 +7,7 @@ This project is designed to automate the school bell system using a Raspberry Pi
 ## Getting Started
 
 ### Connect to Raspberry Pi
-1. Ensure that your Raspberry Pi is powered on and connected to the internet. (This may recquire )
+1. Ensure that your Raspberry Pi is powered on and connected to the internet.
 
 #### Windows (using Cygwin):
 1. Open Cygwin or any other Unix CLI Emulator.
@@ -75,11 +75,13 @@ You can replace "admin" with whatever the account is that is running the script 
 
 2. Select whether to replace the DAY or END bell.
 
-3. Click the "Upload" button.
+3. Specify the 45 second segment you want to upload.
 
-4. Click the "Start" button.
+4. Click the "Upload" button.
 
-5. Wait for the process to complete.
+5. Click the "Start" button.
+
+6. Wait for the process to complete.
 
 **Note**
 Ensure that you click stop before you make any changes.  The upload process might cause an error if the program is not stopped before uploading the song.
