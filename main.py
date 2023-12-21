@@ -1,7 +1,6 @@
 # Import necessary modules and packages
 from flask import Flask, render_template, request, redirect, url_for
-from models import delete_files_in_folder
-from models import createSchedule
+from models import delete_files_in_folder, createSchedule, cut_audio, time_to_seconds
 from datetime import datetime
 import multiprocessing
 import pytz
@@ -63,6 +62,7 @@ def upload_file():
     global stop_audio_event
     global audio_process
     songSubFolder = 'day'  # Default subfolder for songs
+    start_time_seconds = 0
 
     if request.method == 'POST':
         if 'file' not in request.files:
@@ -71,7 +71,12 @@ def upload_file():
         # Retrieve data from the form
         file = request.files['file']
         songSubFolder = request.form.get('selectedOption')
-
+        start_time_seconds = time_to_seconds(request.form.get('start_time'))
+        if start_time_seconds == "error":
+            return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive(), error=True)
+        
+        end_time_seconds = start_time_seconds+45
+        
         if file.filename == '':
             return redirect(request.url)
 
@@ -83,6 +88,9 @@ def upload_file():
             # Save the new file to the song folder
             filename = os.path.join(static_folder_path, file.filename)
             file.save(filename)
+
+            # Set the start and stop times for the song 
+            cut_audio(filename, start_time_seconds, end_time_seconds)
 
             # Set 'daySong' or 'endSong' to the basename of the uploaded file based on the subfolder
             if songSubFolder == 'day':
@@ -101,7 +109,7 @@ def start_audio_player(stop_event):
     global daySong
     global endSong
     songSubFolder = 'day'  # Default subfolder for songs
-    audio_url = url_for('static', filename=os.path.join(songSubFolder, daySong))
+    audio_url = f"/static/{songSubFolder}/{daySong}"
     schedule = createSchedule()
 
     while not stop_event.is_set():
@@ -113,17 +121,17 @@ def start_audio_player(stop_event):
             if item['time'] == current_time:
                 if item['type'] == 'day':
                     songSubFolder = 'day'
-                    audio_url = url_for('static', filename=os.path.join(songSubFolder, daySong))
+                    audio_url = audio_url = f"/static/{songSubFolder}/{daySong}"
                     # Play the audio file using mpg123
                     os.system("mpg123 " + '.' + audio_url)
                     # Wait for 60 seconds before checking the schedule again
                     time.sleep(60)
                 if item['type'] == 'end':
                     songSubFolder = 'end'
-                    audio_url = url_for('static', filename=os.path.join(songSubFolder, endSong))
+                    audio_url = audio_url = f"/static/{songSubFolder}/{endSong}"
                     # Play the audio file using mpg123
                     os.system("mpg123 " + '.' + audio_url)
-                    # Wait for 60 seconds before checking the schedule again
+                    # Wait for 300 seconds before checking the schedule again
                     time.sleep(300)
 
         # Wait for 5 seconds before checking the schedule again

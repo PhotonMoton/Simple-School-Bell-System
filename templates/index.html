@@ -16,8 +16,13 @@
             <option value="day">DAY</option>
             <option value="end">END</option>
         </select>
+        <br>
+        <label for="startTime">Start Time (A 45 second segment will be generated from that time stamp.) :</label>
+        <input type="text" name="start_time" id="start_time" placeholder="HH:MM:SS">
+        <br>
         <input type="submit" value="Upload">
     </form>
+    <br>
     <form method="post" action="/start">
         <input type="submit" value="Start">
     </form>
@@ -29,6 +34,9 @@
         <div>Program is running!</div>
     {% else %}
         <div>Program is off!</div>
+    {% endif %}
+    {% if error %}
+        <div>"Invalid time format. Please enter the time in HH:MM:SS format."</div>
     {% endif %}
 </body>
 
