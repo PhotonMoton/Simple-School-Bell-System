@@ -1,0 +1,29 @@
+html,body{
+    height: 100%;
+    background-color: #F9F7C9 !important;
+}
+.container{ 
+    height: 100%;
+}
+
+div{
+    padding: 5px;
+}
+
+.smith-logo{
+    max-width: 100px!important;
+    max-height: 100px;
+}
+
+#left{
+    background-color: white;
+    height: 70vh;
+    border: 5px solid #80BCBD;
+    border-right: none;
+}
+
+#right{
+    background-color: #AAD9BB;
+    height: 70vh;
+    border: 5px solid #80BCBD;
+}
