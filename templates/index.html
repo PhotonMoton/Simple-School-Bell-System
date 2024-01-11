@@ -2,42 +2,104 @@
 <html>
 
 <head>
-    <title>Python Flask ReplAuth</title>
-    <script src="https://replit.com/public/js/repl-auth-v2.js"></script>
+    <title>SSBS</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
 <body>
-    <h1>DAY: {{ daySong }}</h1>
-    <h1>END: {{ endSong }}</h1>
-    <form method="post" enctype="multipart/form-data" action="/upload">
-        <label for="file">Choose a file:</label>
-        <input type="file" name="file" id="file" accept=".mp3">
-        <select id="dropdown" name="selectedOption">
-            <option value="day">DAY</option>
-            <option value="end">END</option>
-        </select>
-        <br>
-        <label for="startTime">Start Time (A 45 second segment will be generated from that time stamp.) :</label>
-        <input type="text" name="start_time" id="start_time" placeholder="HH:MM:SS">
-        <br>
-        <input type="submit" value="Upload">
-    </form>
-    <br>
-    <form method="post" action="/start">
-        <input type="submit" value="Start">
-    </form>
-    <form method="post" action="/stop">
-        <input type="submit" value="Stop">
-    </form>
+    <div class="container">
+        <div class="row d-flex justify-content-center" id="logo">
+            <img src="../static/assets/smith_logo.png" class="smith-logo">
+        </div>
+        <div class="row text-center d-flex justify-content-center" id="header">
+            <h1>SSBC</h1>
+            <h2>The Smith School</h2>
+        </div>
+        <div class="row" id="content">
+            <div class="col" id="left">
+                <div class="row"> 
+                    <form method="post" enctype="multipart/form-data" action="/upload">
+                        <div class="row">
+                            <div id="passwordHelpBlock" class="form-text">
+                                Upload a song! Make sure it is an MP3 file. [Indicate if it is the DAY song or END song]
+                            </div>
+                            <div class="col-10">
+                                <div class="mb-3">
+                                    <input class="form-control" type="file" name="file" id="file" accept=".mp3">
+                                </div>
+                            </div> 
+                            <div class="col-2">
+                                <select class="form-select" name="selectedOption" aria-label="day or end selector">
+                                    <option selected>Day</option>
+                                    <option value="1">End</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="timeHelpBlock" class="form-text">
+                                Start Time (A 45 second segment will be generated from that time stamp.)  Make sure to input the time in the format "HH:MM:SS" (hours:minutes:seconds)
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="HH:MM:SS" aria-label="Time start." aria-describedby="button-addon2" name="start_time" id="start_time">
+                                <button class="btn btn-primary" type="submit" id="button-addon2">Upload Song</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div id="startHelpBlock" class="form-text">
+                        Start or Stop the program.  When uploading a new song, STOP FIRST -> UPLOAD -> then START again.  Test will run the day song once on press.
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <form method="post" action="/start">
+                                <button type="submit" class="btn btn-success">START</button>
+                            </form>
+                        </div>
+                        <div class="col">
+                            <form method="post" action="/stop">
+                                <button type="submit" class="btn btn-danger">STOP</button>
+                            </form>
+                        </div>
+                        <div class="col">
+                            <form method="post" action="/test">
+                                <button type="submit" class="btn btn-warning">TEST</button>
+                            </form>
+                        </div>
+                        <div class="col d-flex align-items-center">
+                            STATUS:->   
+                            {% if audio_on %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="green" class="bi bi-play-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814z"/>
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-stop-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z"/>
+                                </svg>
+                            {% endif %}
+                        </div>
+                        {% if error %}
+                            <div>"Invalid time format. Please enter the time in HH:MM:SS format."</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col" id="right">
+                <div class="row">
+                    <h1>DAY</h1>
+                    <h2>{{ daySong }}</h2>
+                </div>
+                <div class="row">
+                    <h1>END</h1>
+                    <h2>{{ endSong }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {% if audio_on %}
-        <div>Program is running!</div>
-    {% else %}
-        <div>Program is off!</div>
-    {% endif %}
-    {% if error %}
-        <div>"Invalid time format. Please enter the time in HH:MM:SS format."</div>
-    {% endif %}
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </body>
 
 </html>
