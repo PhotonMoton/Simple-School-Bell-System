@@ -1,4 +1,5 @@
 # Import necessary modules and packages
+import subprocess
 from flask import Flask, render_template, request, redirect, url_for
 from models import delete_files_in_folder, createSchedule, cut_audio, time_to_seconds
 from datetime import datetime
@@ -7,7 +8,7 @@ import pytz
 import time
 import os
 
-# Flask application setup 
+# Flask application setup
 app = Flask(__name__, static_url_path='/static')
 daySong = 'test'  # Default value for day song
 endSong = 'test'  # Default value for end song
@@ -74,9 +75,9 @@ def upload_file():
         start_time_seconds = time_to_seconds(request.form.get('start_time'))
         if start_time_seconds == "error":
             return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive(), error=True)
-        
+
         end_time_seconds = start_time_seconds+45
-        
+
         if file.filename == '':
             return redirect(request.url)
 
@@ -89,7 +90,7 @@ def upload_file():
             filename = os.path.join(static_folder_path, file.filename)
             file.save(filename)
 
-            # Set the start and stop times for the song 
+            # Set the start and stop times for the song
             cut_audio(filename, start_time_seconds, end_time_seconds)
 
             # Set 'daySong' or 'endSong' to the basename of the uploaded file based on the subfolder
@@ -108,8 +109,13 @@ def upload_file():
 def start_audio_player(stop_event):
     global daySong
     global endSong
+
+    # Construct the audio path
+    base_directory = os.path.abspath(os.path.dirname(__file__))
     songSubFolder = 'day'  # Default subfolder for songs
-    audio_url = f"/static/{songSubFolder}/{daySong}"
+    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, daySong))
+
+    # Pull the schedule from model.py
     schedule = createSchedule()
 
     while not stop_event.is_set():
@@ -121,16 +127,18 @@ def start_audio_player(stop_event):
             if item['time'] == current_time:
                 if item['type'] == 'day':
                     songSubFolder = 'day'
-                    audio_url = audio_url = f"/static/{songSubFolder}/{daySong}"
+                    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, daySong))
                     # Play the audio file using mpg123
-                    os.system("mpg123 " + '.' + audio_url)
+                    os.system("mpg123 " + audio_url)
+
                     # Wait for 60 seconds before checking the schedule again
                     time.sleep(60)
                 if item['type'] == 'end':
                     songSubFolder = 'end'
-                    audio_url = audio_url = f"/static/{songSubFolder}/{endSong}"
+                    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, endSong))
                     # Play the audio file using mpg123
-                    os.system("mpg123 " + '.' + audio_url)
+                    os.system("mpg123 " + audio_url)
+
                     # Wait for 300 seconds before checking the schedule again
                     time.sleep(300)
 
@@ -173,6 +181,22 @@ def stop():
     # Redirect to the index page with the current song
     return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
 
+# Route for the test play button
+@app.route('/test', methods=['POST', 'GET'])
+def test():
+
+    # Construct the audio path
+    base_directory = os.path.abspath(os.path.dirname(__file__))
+    audio_url = os.path.abspath(os.path.join(base_directory, 'static', 'day', daySong))
+
+    # Run audio and wait 60 seconds
+    os.system("mpg123 " + audio_url)
+    time.sleep(60)
+
+    # Redirect to the index page with the current song
+    return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+
+
 # Run the Flask application
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, debug=True)
