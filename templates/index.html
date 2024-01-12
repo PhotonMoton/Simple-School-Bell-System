@@ -13,12 +13,12 @@
             <img src="../static/assets/smith_logo.png" class="smith-logo">
         </div>
         <div class="row text-center d-flex justify-content-center" id="header">
-            <h1>SSBC</h1>
+            <h1>SSBS</h1>
             <h2>The Smith School</h2>
         </div>
         <div class="row" id="content">
-            <div class="col" id="left">
-                <div class="row"> 
+            <div class="col d-flex flex-column align-items-center justify-content-center" id="left">
+                <div class="row">
                     <form method="post" enctype="multipart/form-data" action="/upload">
                         <div class="row">
                             <div id="passwordHelpBlock" class="form-text">
@@ -38,7 +38,7 @@
                         </div>
                         <div class="row">
                             <div id="timeHelpBlock" class="form-text">
-                                Start Time (A 45 second segment will be generated from that time stamp.)  Make sure to input the time in the format "HH:MM:SS" (hours:minutes:seconds)
+                                Start Time (A 45-second segment will be generated from that time stamp.)  Make sure to input the time in the format "HH:MM:SS" (hours:minutes:seconds)
                             </div>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" placeholder="HH:MM:SS" aria-label="Time start." aria-describedby="button-addon2" name="start_time" id="start_time">
@@ -49,7 +49,7 @@
                 </div>
                 <div class="row">
                     <div id="startHelpBlock" class="form-text">
-                        Start or Stop the program.  When uploading a new song, STOP FIRST -> UPLOAD -> then START again.  Test will run the day song once on press.
+                        Start or Stop the program. When uploading a new song, STOP FIRST -> UPLOAD -> then START again. Test will run the day song once on press.
                     </div>
                     <div class="row">
                         <div class="col">
@@ -85,14 +85,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col" id="right">
+            
+            <div class="col d-flex align-items-center justify-content-center" id="right">
                 <div class="row">
-                    <h1>DAY</h1>
-                    <h2>{{ daySong }}</h2>
-                </div>
-                <div class="row">
-                    <h1>END</h1>
-                    <h2>{{ endSong }}</h2>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-3 time"><h1>DAY</h1></div>
+                            <div class="col-9 song"><h2>{{ daySong }}</h2></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-3 time"><h1>END</h1></div>
+                            <div class="col-9 song"><h2>{{ endSong }}</h2></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -27,3 +27,14 @@ div{
     height: 70vh;
     border: 5px solid #80BCBD;
 }
+
+.time{
+
+    border: 5px solid #80BCBD;
+}
+
+.song{
+
+    border: 5px solid #80BCBD;
+    background-color: #80BCBD;
+}
