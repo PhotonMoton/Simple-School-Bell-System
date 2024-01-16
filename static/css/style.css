@@ -10,9 +10,9 @@ div{
     padding: 5px;
 }
 
-.smith-logo{
-    max-width: 100px!important;
-    max-height: 100px;
+.logo{
+    max-width: 400px!important;
+    max-height: 400px;
 }
 
 #left{
