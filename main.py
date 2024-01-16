@@ -90,11 +90,11 @@ def upload_file():
             filename = os.path.join(static_folder_path, file.filename)
             file.save(filename)
 
-            # Set the start and stop times for the song
-            cut_audio(filename, start_time_seconds, end_time_seconds)
 
             # Set 'daySong' or 'endSong' to the basename of the uploaded file based on the subfolder
             if songSubFolder == 'day':
+                # Set the start and stop times for the song
+                cut_audio(filename, start_time_seconds, end_time_seconds)
                 daySong = os.path.basename(filename)
             if songSubFolder == 'end':
                 endSong = os.path.basename(filename)
