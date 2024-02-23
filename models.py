@@ -2,7 +2,7 @@ import os
 from pydub import AudioSegment
 from datetime import datetime
 
-def createSchedule():
+def create_schedule():
   schedule = [
     {"time":"08:25 AM", "type":"day"},
     {"time":"08:30 AM", "type":"day"},

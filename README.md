@@ -177,3 +177,12 @@ To ensure that the School Bell Management System runs automatically on boot, fol
     ```
 
 Now, the School Bell Management System should automatically start on boot.
+
+
+## Future Updates
+
+1. Edit Schedule Panel - For now the only way to change the schedule is to edit the `models.py` file.
+
+2. Connect to an audio-clip api to facilitate song selection.
+
+3. QOL/

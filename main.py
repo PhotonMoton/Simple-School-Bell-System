@@ -1,202 +1,228 @@
-# Import necessary modules and packages
-import subprocess
-from flask import Flask, render_template, request, redirect, url_for
-from models import delete_files_in_folder, createSchedule, cut_audio, time_to_seconds
-from datetime import datetime
-import multiprocessing
-import pytz
-import time
-import os
+import subprocess  # For executing shell commands
+from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
+from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds 
+from datetime import datetime  # For handling date and time operations
+import multiprocessing  # For parallel execution
+import pytz  # For timezone conversions
+import time  # For sleep/delay operations
+import os  # For file system operations
+import re # For sanitizing filenames
 
-# Flask application setup
+# Initialize Flask app with a specific static_url_path
 app = Flask(__name__, static_url_path='/static')
-daySong = 'test'  # Default value for day song
-endSong = 'test'  # Default value for end song
-audio_process = None  # Process for audio player
-stop_audio_event = multiprocessing.Event()  # Event to signal audio player to stop
 
-# Route to display the index page
-@app.route('/')
-def index():
-    global daySong
-    global endSong
-    global audio_process
+# Initialize variables for managing audio processes and app state
+audio_process = None  # Placeholder for the audio playing process
+stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 100}  # App state dictionary
 
-    # Retrieve the path to the 'day' folder within the app
-    day_folder_path = os.path.join(app.root_path, 'static', 'day')
+def sanitize_filename(filename):
+    """
+    Sanitizes the filename by removing spaces and punctuation from the base name,
+    preserving the file extension, and handling extra dots correctly.
+    """
+    base_name, extension = os.path.splitext(filename)
+    
+    # Replace spaces with underscores in the base name
+    sanitized_base = base_name.replace(" ", "_")
+    
+    # Remove punctuation except for dots and underscores in the base name
+    sanitized_base = re.sub(r'[^\w-]', '', sanitized_base)
+    
+    # Combine the sanitized base name with the original extension
+    sanitized_filename = sanitized_base + extension
+    
+    return sanitized_filename
 
-    # Get a list of files in the 'day' folder
-    files_in_folder = os.listdir(day_folder_path)
+# Function to get a list of files in a given folder
+def get_files_in_folder(folder_path):
+    #Returns a list of file names in the specified folder path. Returns an empty list if the folder does not exist
+    return [os.path.basename(file) for file in os.listdir(folder_path)] if os.path.exists(folder_path) else []
 
-    if files_in_folder:
-        # Iterate through the files and set 'daySong' to the last file in the folder
-        for file in files_in_folder:
-            daySong = os.path.basename(file)
+# Function to get the full file path for a file in the static directory
+def get_full_file_path(subfolder, filename):
+    #Constructs and returns the absolute path for a file located in a subfolder of the app's static directory
+    return os.path.abspath(os.path.join(app.root_path, 'static', subfolder, filename))
 
-    # Retrieve the path to the 'end' folder within the app
-    end_folder_path = os.path.join(app.root_path, 'static', 'end')
-
-    # Get a list of files in the 'end' folder
-    files_in_folder = os.listdir(end_folder_path)
-
-    if files_in_folder:
-        # Iterate through the files and set 'endSong' to the last file in the folder
-        for file in files_in_folder:
-            endSong = os.path.basename(file)
-
-        if audio_process is None or not audio_process.is_alive():
-            # Clear the stop event to allow the audio player to run
-            stop_audio_event.clear()
-
-            # Start a new process for the audio player
-            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-            audio_process.start()
-    # Render the index.html template with the last files saved as the current song
-    return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
-
-
-# Route to handle file uploads
-@app.route('/upload', methods=['POST', 'GET'])
-def upload_file():
-    global daySong
-    global endSong
-    global stop_audio_event
-    global audio_process
-    songSubFolder = 'day'  # Default subfolder for songs
-    start_time_seconds = 0
-
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
-
-        # Retrieve data from the form
-        file = request.files['file']
-        songSubFolder = request.form.get('selectedOption')
-        start_time_seconds = time_to_seconds(request.form.get('start_time'))
-        if start_time_seconds == "error":
-            return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive(), error=True)
-
-        end_time_seconds = start_time_seconds+45
-
-        if file.filename == '':
-            return redirect(request.url)
-
-        if file:
-            # Delete all files in the song folder before uploading a new file
-            static_folder_path = os.path.join(app.root_path, 'static',  songSubFolder)
-            delete_files_in_folder(static_folder_path)
-
-            # Save the new file to the song folder
-            filename = os.path.join(static_folder_path, file.filename)
-            file.save(filename)
-
-
-            # Set 'daySong' or 'endSong' to the basename of the uploaded file based on the subfolder
-            if songSubFolder == 'day':
-                # Set the start and stop times for the song
-                cut_audio(filename, start_time_seconds, end_time_seconds)
-                daySong = os.path.basename(filename)
-            if songSubFolder == 'end':
-                endSong = os.path.basename(filename)
-
-            # Redirect to the index page with the new song
-            return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
-
-    # Redirect to the index page if the request method is not POST
-    return redirect(url_for('index'))
+# Function to update the application state with the current song based on the subfolder and filename
+def update_app_state(subfolder, filename):
+    #Updates the app_state dictionary with the filename of the current song, based on the subfolder
+    app_state[subfolder + "Song"] = filename
 
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
-    global daySong
-    global endSong
-
-    # Construct the audio path
-    base_directory = os.path.abspath(os.path.dirname(__file__))
-    songSubFolder = 'day'  # Default subfolder for songs
-    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, daySong))
-
-    # Pull the schedule from model.py
-    schedule = createSchedule()
-
+    #Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     while not stop_event.is_set():
-        # Get the current time in the Eastern Time zone
-        eastern_timezone = pytz.timezone('US/Eastern')
-        current_time = datetime.now(eastern_timezone).strftime("%I:%M %p")
+        current_time = datetime.now(pytz.timezone('US/Eastern')).strftime("%I:%M %p")
+        schedule = create_schedule()
 
         for item in schedule:
             if item['time'] == current_time:
-                if item['type'] == 'day':
-                    songSubFolder = 'day'
-                    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, daySong))
-                    # Play the audio file using mpg123
-                    os.system("mpg123 " + audio_url)
+                subfolder = 'day' if item['type'] == 'day' else 'end'
+                filename = app_state[subfolder + "Song"]
+                audio_url = get_full_file_path(subfolder, filename)
+                subprocess.run(["mpg123", audio_url])
 
-                    # Wait for 60 seconds before checking the schedule again
-                    time.sleep(60)
-                if item['type'] == 'end':
-                    songSubFolder = 'end'
-                    audio_url = os.path.abspath(os.path.join(base_directory, 'static', songSubFolder, endSong))
-                    # Play the audio file using mpg123
-                    os.system("mpg123 " + audio_url)
+                wait_time = 60 if item['type'] == 'day' else 300
+                time.sleep(wait_time)
 
-                    # Wait for 300 seconds before checking the schedule again
-                    time.sleep(300)
-
-        # Wait for 5 seconds before checking the schedule again
         time.sleep(5)
 
-# Route to start the audio player
-@app.route('/start', methods=['POST', 'GET'])
-def start():
-    global audio_process
-    global stop_audio_event
-
-    if audio_process is None or not audio_process.is_alive():
-        # Clear the stop event to allow the audio player to run
-        stop_audio_event.clear()
-
-        # Start a new process for the audio player
+def restart_audio_player():
+    global audio_process, stop_audio_event, app_state
+    # Check if the audio process is currently running
+    if audio_process is not None and audio_process.is_alive():
+        # If running, signal the current process to stop
+        stop_audio_event.set()
+        audio_process.join()  # Wait for it to stop
+        stop_audio_event.clear()  # Reset the event for next use
+        
+        # Start a new audio process with the updated state
         audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
         audio_process.start()
-
-        # Redirect to the index page with the current song
-        return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+        app_state["audio_state"] = True  # Ensure the audio state is marked as running
     else:
-        # Redirect to the index page with the current song if the audio player is already running
-        return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+        # If not running, just update the state without starting the process
+        # This is useful when the application is in a stopped state
+        app_state["audio_state"] = False  # Ensure the audio state is marked as not running
 
-# Route to stop the audio player
+def set_volume(volume):
+    #Set the system volume with amixer (ALSA). Volume is a percentage
+    subprocess.run(['amixer', 'set', 'Master', f'{volume}%'])
+
+
+# Flask route for the index page
+@app.route('/', methods=['POST', 'GET'])
+def index():
+    #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
+    global audio_process, stop_audio_event, app_state
+
+    # Determine paths for day and end song folders
+    day_folder_path = os.path.join(app.root_path, 'static', 'day')
+    end_folder_path = os.path.join(app.root_path, 'static', 'end')
+
+    # Update app state with the latest song files from each folder
+    app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
+    app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
+
+    # Start audio process if it's not already running
+    if audio_process is None:
+        stop_audio_event.clear()
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True
+        set_volume(app_state['volume'])
+
+    return render_template('index.html', app_state=app_state)
+
+# Flask route for uploading files
+@app.route('/upload', methods=['POST', 'GET'])
+def upload_file():
+    #Handles file uploads, updates app state, and initiates audio processing for uploaded files
+    global app_state, stop_audio_event, audio_process
+
+    if request.method == 'POST':
+        file = request.files.get('file')
+        song_subfolder = request.form.get('selectedOption')
+        start_time_seconds = time_to_seconds(request.form.get('start_time'))
+
+        if start_time_seconds == "error":
+            app_state["error"] = True
+            return render_template('index.html', app_state=app_state)
+
+        app_state["error"] = False
+        end_time_seconds = start_time_seconds + 45
+
+        if file:
+            # Sanitize the filename
+            clean_name = sanitize_filename(file.filename)
+
+            static_folder_path = os.path.join(app.root_path, 'static', song_subfolder)
+            delete_files_in_folder(static_folder_path)
+
+            filename = os.path.join(static_folder_path, clean_name)
+            file.save(filename)
+
+            if song_subfolder == 'day':
+                cut_audio(filename, start_time_seconds, end_time_seconds)
+
+            update_app_state(song_subfolder, os.path.basename(filename))
+            restart_audio_player()
+            return render_template('index.html', app_state=app_state)
+
+    return render_template('index.html', app_state=app_state)
+
+# Flask route to start audio playback
+@app.route('/start', methods=['POST', 'GET'])
+def start():
+    #Starts the audio playback process if it is not already running and updates the application state
+    global audio_process, stop_audio_event, app_state
+
+    # Check if the audio process is not running and start it
+    if audio_process is None or not audio_process.is_alive():
+        stop_audio_event.clear()  # Reset the stop event
+        # Create and start a new process for the audio player
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True  
+
+    # Render and return the index page with the updated application state
+    return render_template('index.html', app_state=app_state)
+
+# Flask route to stop audio playback
 @app.route('/stop', methods=['POST', 'GET'])
 def stop():
-    global audio_process
-    global stop_audio_event
+    #Stops the audio playback process if it is running and updates the application state
+    global audio_process, stop_audio_event, app_state
 
+    # Check if the audio process is running
     if audio_process and audio_process.is_alive():
-        # Set the stop event to signal the audio player to stop
-        stop_audio_event.set()
+        stop_audio_event.set()  # Signal the process to stop
+        audio_process.join()  # Wait for the process to finish
+        app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
 
-        # Wait for the audio player process to stop
-        audio_process.join()
+    # Render and return the index page with the updated application state
+    return render_template('index.html', app_state=app_state)
 
-    # Redirect to the index page with the current song
-    return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
-
-# Route for the test play button
+# Flask route for testing audio playback
 @app.route('/test', methods=['POST', 'GET'])
 def test():
+    #Tests the audio playback functionality independently of the scheduled playback
+    global app_state, audio_process
 
-    # Construct the audio path
-    base_directory = os.path.abspath(os.path.dirname(__file__))
-    audio_url = os.path.abspath(os.path.join(base_directory, 'static', 'day', daySong))
+    # Start the audio process for testing if it's not already running
+    if audio_process is None or not audio_process.is_alive():
+        stop_audio_event.clear()  # Ensure any previous stop event is cleared
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True  
 
-    # Run audio and wait 60 seconds
-    os.system("mpg123 " + audio_url)
-    time.sleep(60)
+    # Directly play the day song for testing
+    audio_url = get_full_file_path('day', app_state["daySong"])
+    subprocess.run(["mpg123", audio_url])
+    time.sleep(60)  # Wait for 60 seconds after playing the test audio
 
-    # Redirect to the index page with the current song
-    return render_template('index.html', daySong=daySong, endSong=endSong, audio_on=audio_process.is_alive())
+    # Stop the audio process after testing
+    if audio_process and audio_process.is_alive():
+        stop_audio_event.set()  # Signal the process to stop
+        audio_process.join()  # Wait for the process to finish
+        app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
+
+    # Render and return the index page with the updated application state
+    return render_template('index.html', app_state=app_state)
+
+# Flask route for changing the volume
+@app.route('/volume', methods=['POST','GET'])
+def volume():
+    global app_state
+    if request.method == 'POST':
+        new_volume = request.form.get('volume')
+        app_state['volume']=new_volume
+        set_volume(new_volume)
+    return render_template('index.html', app_state=app_state)
 
 
-# Run the Flask application
+# Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":
+    # Start the Flask application with debug mode enabled for development purposes
     app.run(host='0.0.0.0', port=8080, debug=True)
