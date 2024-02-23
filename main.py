@@ -190,12 +190,14 @@ def test():
     #Tests the audio playback functionality independently of the scheduled playback
     global app_state, audio_process
 
+    was_running= True
     # Start the audio process for testing if it's not already running
     if audio_process is None or not audio_process.is_alive():
         stop_audio_event.clear()  # Ensure any previous stop event is cleared
         audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
         audio_process.start()
-        app_state["audio_state"] = True  
+        app_state["audio_state"] = True
+        was_running= False  
 
     # Directly play the day song for testing
     audio_url = get_full_file_path('day', app_state["daySong"])
@@ -203,7 +205,7 @@ def test():
     time.sleep(60)  # Wait for 60 seconds after playing the test audio
 
     # Stop the audio process after testing
-    if audio_process and audio_process.is_alive():
+    if was_running == False:
         stop_audio_event.set()  # Signal the process to stop
         audio_process.join()  # Wait for the process to finish
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
