@@ -216,7 +216,7 @@ def test():
 def volume():
     global app_state
     if request.method == 'POST':
-        new_volume = request.form.get('volume')
+        new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
         set_volume(new_volume)
     return render_template('index.html', app_state=app_state)
