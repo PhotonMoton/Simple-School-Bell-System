@@ -37,6 +37,11 @@ div{
 
     border: 5px solid #80BCBD;
     background-color: #80BCBD;
+    overflow: scroll;
+}
+
+.volume{
+    border: 5px solid #80BCBD;
 }
 
 #loadingOverlay {

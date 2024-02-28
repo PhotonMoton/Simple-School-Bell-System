@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 100}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75}  # App state dictionary
 
 def sanitize_filename(filename):
     """
@@ -226,5 +226,4 @@ def volume():
 
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":
-    # Start the Flask application with debug mode enabled for development purposes
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='10.0.1.179', port=8080)
