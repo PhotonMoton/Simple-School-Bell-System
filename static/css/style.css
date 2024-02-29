@@ -38,6 +38,8 @@ div{
     border: 5px solid #80BCBD;
     background-color: #80BCBD;
     overflow: scroll;
+    scrollbar-color: #80BCBD #AAD9BB;
+    scrollbar-width: thin;
 }
 
 .volume{
