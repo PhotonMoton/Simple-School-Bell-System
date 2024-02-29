@@ -38,7 +38,7 @@ div{
     border: 5px solid #80BCBD;
     background-color: #80BCBD;
     overflow: scroll;
-    scrollbar-color: #80BCBD #AAD9BB;
+    scrollbar-color: #AAD9BB #80BCBD;
     scrollbar-width: thin;
 }
 
