@@ -31,20 +31,27 @@ div{
 .time{
 
     border: 5px solid #80BCBD;
+    background-color: #AAD9BB;
 }
 
 .song{
 
     border: 5px solid #80BCBD;
-    background-color: #80BCBD;
+    background-color: #AAD9BB;
     overflow: scroll;
-    scrollbar-color: #AAD9BB #80BCBD;
+    scrollbar-color: #80BCBD #AAD9BB ;
     scrollbar-width: thin;
 }
 
 .volume{
-    border: 5px solid #80BCBD;
+    border: 5px solid #AAD9BB;
 }
+
+#rightContent{
+    background-color: #80BCBD;
+}
+
+
 
 #loadingOverlay {
     position: fixed;
@@ -59,3 +66,4 @@ div{
     justify-content: center;
     z-index: 1000;
 }
+
