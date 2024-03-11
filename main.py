@@ -1,6 +1,6 @@
 import subprocess  # For executing shell commands
 from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
-from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds 
+from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule 
 from datetime import datetime  # For handling date and time operations
 import multiprocessing  # For parallel execution
 import pytz  # For timezone conversions
@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":create_schedule()}  # App state dictionary
 
 def sanitize_filename(filename):
     """
@@ -54,7 +54,7 @@ def start_audio_player(stop_event):
     #Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     while not stop_event.is_set():
         current_time = datetime.now(pytz.timezone('US/Eastern')).strftime("%I:%M %p")
-        schedule = create_schedule()
+        schedule = app_state["schedule"]
 
         for item in schedule:
             if item['time'] == current_time:
@@ -104,6 +104,9 @@ def index():
     # Update app state with the latest song files from each folder
     app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
     app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
+
+    # Update app state with the latest user edited schedule
+    app_state["schedule"] = get_schedule()
 
     # Start audio process if it's not already running
     if audio_process is None:
@@ -223,6 +226,51 @@ def volume():
         set_volume(new_volume)
     return render_template('index.html', app_state=app_state)
 
+# Flask route for adding a new time slot to the schedule
+@app.route('/add-slot', methods=['POST', 'GET'])
+def add_slot():
+    global app_state
+    if request.method == 'POST':
+        schedule = app_state["schedule"]
+        
+        # Get the new time from the front end and make sure it is set to a datetime to compare against current schedule list
+        new_entry = {"time":request.form.get('new_time'), "type":request.form.get('new_type')}
+        new_entry_time = datetime.strptime(new_entry['time'], '%I:%M %p')
+
+        # Find the position where the new entry should be inserted
+        position = 0
+        for entry in schedule:
+            if datetime.strptime(entry['time'], '%I:%M %p') > new_entry_time:
+                position = schedule.index(entry)
+                break
+
+
+        # Insert the new entry into the schedule
+        schedule.insert(position, new_entry)
+
+        # Make necessary updates
+        app_state["schedule"] = schedule
+        update_schedule(schedule)
+        restart_audio_player()
+    return render_template('index.html', app_state=app_state)
+
+# Flask route for removing a time slot to the schedule
+@app.route('/remove-slot', methods=['POST', 'GET'])
+def remove_slot():
+    global app_state
+    if request.method == 'POST':
+        schedule = app_state["schedule"]
+        
+        # Get the time slot to delete from the front end and remove it
+        to_delete = {"time":request.form.get('del_time'), "type":request.form.get('del_type')}
+        if to_delete in schedule:
+            schedule.remove(to_delete)
+
+        # Make necessary updates
+        app_state["schedule"] = schedule
+        update_schedule(schedule)
+        restart_audio_player()
+    return render_template('index.html', app_state=app_state)
 
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":

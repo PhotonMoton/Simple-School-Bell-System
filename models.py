@@ -1,7 +1,9 @@
 import os
+import json
 from pydub import AudioSegment
 from datetime import datetime
 
+# Create a default schedule
 def create_schedule():
   schedule = [
     {"time":"08:25 AM", "type":"day"},
@@ -21,9 +23,21 @@ def create_schedule():
     {"time":"01:40 PM", "type":"day"},
     {"time":"02:20 PM", "type":"day"},
     {"time":"02:25 PM", "type":"day"},
-    {"time":"03:05 PM", "type":"end"}, 
+    {"time":"03:05 PM", "type":"end"} 
   ]
   return schedule
+
+def update_schedule(new_schedule):
+    with open('schedule.json', 'w') as file:
+        json.dump(new_schedule, file)
+
+def get_schedule():
+    with open('schedule.json', 'r') as file:
+       return json.load(file)
+
+def reset_schedule():
+    with open('schedule.json', 'w') as file:
+        json.dump(create_schedule(), file)
 
 def delete_files_in_folder(folder_path):
   # Get a list of all files in the folder

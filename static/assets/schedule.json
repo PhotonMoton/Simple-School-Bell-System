@@ -1,0 +1,20 @@
+[
+    {"time":"08:25 AM", "type":"day"},
+    {"time":"08:30 AM", "type":"day"},
+    {"time":"09:10 AM", "type":"day"},
+    {"time":"09:15 AM", "type":"day"},
+    {"time":"09:55 AM", "type":"day"},
+    {"time":"10:00 AM", "type":"day"},
+    {"time":"10:40 AM", "type":"day"},
+    {"time":"10:45 AM", "type":"day"},
+    {"time":"11:25 AM", "type":"day"},
+    {"time":"12:05 PM", "type":"day"},
+    {"time":"12:10 PM", "type":"day"},
+    {"time":"12:50 PM", "type":"day"},
+    {"time":"12:55 PM", "type":"day"},
+    {"time":"01:35 PM", "type":"day"},
+    {"time":"01:40 PM", "type":"day"},
+    {"time":"02:20 PM", "type":"day"},
+    {"time":"02:25 PM", "type":"day"},
+    {"time":"03:05 PM", "type":"end"} 
+  ]
