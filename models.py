@@ -32,6 +32,10 @@ def update_schedule(new_schedule):
         json.dump(new_schedule, file)
 
 def get_schedule():
+    # Check if the schedule.json file exists
+    if not os.path.exists('schedule.json'):
+    # If not, create a new schedule and save it to schedule.json
+        reset_schedule()
     with open('schedule.json', 'r') as file:
        return json.load(file)
 
