@@ -51,6 +51,9 @@ div{
     background-color: #80BCBD;
 }
 
+.schedule{
+    border: 2px dashed #80BCBD;
+}
 
 
 #loadingOverlay {

@@ -233,17 +233,29 @@ def add_slot():
     if request.method == 'POST':
         schedule = app_state["schedule"]
         
-        # Get the new time from the front end and make sure it is set to a datetime to compare against current schedule list
-        new_entry = {"time":request.form.get('new_time'), "type":request.form.get('new_type')}
-        new_entry_time = datetime.strptime(new_entry['time'], '%I:%M %p')
+        # Get the new time from the front end in 24-hour format
+        new_time_24hr = request.form.get('new_time')  # Expected in 24-hour format, e.g., "15:45"
+
+        # Convert the 24-hour format time to 12-hour format as a text string
+        new_time_obj = datetime.strptime(new_time_24hr, '%H:%M')
+        new_time_12hr = new_time_obj.strftime('%I:%M %p')  # Converted to 12-hour format
+
+        # Create the new entry with the time as a text string
+        new_entry = {
+            "time": new_time_12hr,  # Time in 12-hour format as text
+            "type": request.form.get('new_type')
+        }
+
+        # Convert new_entry time back to datetime for comparison
+        new_entry_time = datetime.strptime(new_time_12hr, '%I:%M %p')
 
         # Find the position where the new entry should be inserted
-        position = 0
+        position = len(schedule)  # Default to end if no earlier time is found
         for entry in schedule:
-            if datetime.strptime(entry['time'], '%I:%M %p') > new_entry_time:
+            entry_time = datetime.strptime(entry['time'], '%I:%M %p')
+            if entry_time > new_entry_time:
                 position = schedule.index(entry)
                 break
-
 
         # Insert the new entry into the schedule
         schedule.insert(position, new_entry)
@@ -252,6 +264,7 @@ def add_slot():
         app_state["schedule"] = schedule
         update_schedule(schedule)
         restart_audio_player()
+
     return render_template('index.html', app_state=app_state)
 
 # Flask route for removing a time slot to the schedule

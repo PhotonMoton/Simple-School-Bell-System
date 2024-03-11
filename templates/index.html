@@ -85,15 +85,51 @@
                     <div class="accordion" id="accordionExample">
                         <div class="accordion-item">
                           <h2 class="accordion-header">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                              <h2>SCHEDULE EDITOR</h2>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                              SCHEDULE EDITOR
                             </button>
                           </h2>
-                          <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                          <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
                                 {% for time_slot in app_state["schedule"] %}
-                                TIME: {{time_slot["time"]}}  TYPE: {{time_slot["type"]}}
+                                <form action="/remove-slot" method="post">
+                                    <!-- Jinja Loop to populate the Schedule -->
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <p class="schedule">TIME: {{time_slot["time"]}}  TYPE: {{time_slot["type"]}}</p>
+                                                <!-- Hidden inputs for time and type -->
+                                                <input type="hidden" name="time" value="{{ time_slot['time'] }}">
+                                                <input type="hidden" name="type" value="{{ time_slot['type'] }}">
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="submit" class="btn btn-sm btn-danger">REMOVE</button>
+                                        </div>
+                                    </div>
+                                </form>
                                 {% endfor %}
+                                <form action="/add-slot" method="post">
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <div class= "row">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label for="time">Time:</label>
+                                                        <input type="time" id="time" name="time" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <label for="type">Type:</label>
+                                                        <input type="text" id="type" name="type" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="submit" class="btn btn-sm btn-success">ADD</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                           </div>
                         </div>
