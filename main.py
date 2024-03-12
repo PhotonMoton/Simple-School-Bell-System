@@ -97,24 +97,27 @@ def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
 
-    # Determine paths for day and end song folders
-    day_folder_path = os.path.join(app.root_path, 'static', 'day')
-    end_folder_path = os.path.join(app.root_path, 'static', 'end')
+    # Check if the request is redirected from remove_slot
+    redirected = request.args.get('redirected', default=False, type=bool)
+    if not redirected:
+        # Determine paths for day and end song folders
+        day_folder_path = os.path.join(app.root_path, 'static', 'day')
+        end_folder_path = os.path.join(app.root_path, 'static', 'end')
 
-    # Update app state with the latest song files from each folder
-    app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
-    app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
+        # Update app state with the latest song files from each folder
+        app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
+        app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
 
-    # Update app state with the latest user edited schedule
-    app_state["schedule"] = get_schedule()
+        # Update app state with the latest user edited schedule
+        app_state["schedule"] = get_schedule()
 
-    # Start audio process if it's not already running
-    if audio_process is None:
-        stop_audio_event.clear()
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-        audio_process.start()
-        app_state["audio_state"] = True
-        set_volume(app_state['volume'])
+        # Start audio process if it's not already running
+        if audio_process is None:
+            stop_audio_event.clear()
+            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+            audio_process.start()
+            app_state["audio_state"] = True
+            set_volume(app_state['volume'])
 
     return render_template('index.html', app_state=app_state)
 
@@ -131,7 +134,7 @@ def upload_file():
 
         if start_time_seconds == "error":
             app_state["error"] = True
-            return render_template('index.html', app_state=app_state)
+            return redirect(url_for('index', redirected=True))
 
         app_state["error"] = False
         end_time_seconds = start_time_seconds + 45
@@ -151,9 +154,9 @@ def upload_file():
 
             update_app_state(song_subfolder, os.path.basename(filename))
             restart_audio_player()
-            return render_template('index.html', app_state=app_state)
+            return redirect(url_for('index', redirected=True))
 
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route to start audio playback
 @app.route('/start', methods=['POST', 'GET'])
@@ -170,7 +173,7 @@ def start():
         app_state["audio_state"] = True  
 
     # Render and return the index page with the updated application state
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route to stop audio playback
 @app.route('/stop', methods=['POST', 'GET'])
@@ -185,7 +188,7 @@ def stop():
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
 
     # Render and return the index page with the updated application state
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route for testing audio playback
 @app.route('/test', methods=['POST', 'GET'])
@@ -214,7 +217,7 @@ def test():
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
 
     # Render and return the index page with the updated application state
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route for changing the volume
 @app.route('/volume', methods=['POST','GET'])
@@ -224,7 +227,7 @@ def volume():
         new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
         set_volume(new_volume)
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route for adding a new time slot to the schedule
 @app.route('/add-slot', methods=['POST', 'GET'])
@@ -265,7 +268,7 @@ def add_slot():
         update_schedule(schedule)
         restart_audio_player()
 
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Flask route for removing a time slot to the schedule
 @app.route('/remove-slot', methods=['POST', 'GET'])
@@ -283,7 +286,7 @@ def remove_slot():
         app_state["schedule"] = schedule
         update_schedule(schedule)
         restart_audio_player()
-    return render_template('index.html', app_state=app_state)
+    return redirect(url_for('index', redirected=True))
 
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":
