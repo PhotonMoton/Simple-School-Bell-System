@@ -110,8 +110,8 @@
                                         <!-- Jinja Loop to populate the Schedule -->
                                         <div class="row">
                                             <div class="col-10">
-                                                <p class="schedule">TIME: {{time_slot["time"]}} TYPE:
-                                                    {{time_slot["type"]}}</p>
+                                                <p class="schedule">TIME: <span style="color:blue;"><strong>{{time_slot["time"]}}</strong></span> TYPE:
+                                                    <span style="color: brown;"><strong>{{time_slot["type"]}}</strong></span></p>
                                                 <!-- Hidden inputs for time and type -->
                                                 <input type="hidden" name="time" value="{{ time_slot['time'] }}">
                                                 <input type="hidden" name="type" value="{{ time_slot['type'] }}">
@@ -151,11 +151,6 @@
                                         </div>
 
                                     </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
                                 </div>
                             </div>
                         </div>
