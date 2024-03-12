@@ -234,7 +234,7 @@ def add_slot():
         schedule = app_state["schedule"]
         
         # Get the new time from the front end in 24-hour format
-        new_time_24hr = request.form.get('new_time')  # Expected in 24-hour format, e.g., "15:45"
+        new_time_24hr = request.form.get('time')  # Expected in 24-hour format, e.g., "15:45"
 
         # Convert the 24-hour format time to 12-hour format as a text string
         new_time_obj = datetime.strptime(new_time_24hr, '%H:%M')
@@ -243,7 +243,7 @@ def add_slot():
         # Create the new entry with the time as a text string
         new_entry = {
             "time": new_time_12hr,  # Time in 12-hour format as text
-            "type": request.form.get('new_type')
+            "type": request.form.get('type')
         }
 
         # Convert new_entry time back to datetime for comparison
@@ -275,7 +275,7 @@ def remove_slot():
         schedule = app_state["schedule"]
         
         # Get the time slot to delete from the front end and remove it
-        to_delete = {"time":request.form.get('del_time'), "type":request.form.get('del_type')}
+        to_delete = {"time":request.form.get('time'), "type":request.form.get('type')}
         if to_delete in schedule:
             schedule.remove(to_delete)
 
