@@ -20,6 +20,10 @@ div{
     height: 70vh;
     border: 5px solid #80BCBD;
     border-right: none;
+
+}
+
+#scheduleModal{
     overflow: scroll;
     scrollbar-color: #80BCBD #AAD9BB ;
     scrollbar-width: thin;
@@ -56,6 +60,10 @@ div{
 
 .schedule{
     border: 2px dashed #80BCBD;
+}
+
+.addSlot{
+    border: 2px dotted #AAD9BB;
 }
 
 
