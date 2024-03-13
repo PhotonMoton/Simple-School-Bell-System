@@ -155,11 +155,23 @@
                                                 <button type="submit" class="btn btn-lg btn-success">ADD</button>
                                             </div>
                                         </div>
-
                                     </form>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% if app_state["schedule"] == 1 %}
+                        <p class="scheduleIndicator">Schedule One Loaded</p>
+                        {% endif %}
+                        {% if app_state["schedule"] == 2 %}
+                        <p>Schedule Two Loaded</p>
+                        {% endif %}
+                        {% if app_state["schedule"] == 3 %}
+                        <p>Schedule Three Loaded</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

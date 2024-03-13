@@ -66,6 +66,10 @@ div{
     border: 2px dotted #AAD9BB;
 }
 
+.scheduleIndicator{
+    background-color: #AAD9BB;
+    border: 5px solid #80BCBD;
+}
 
 #loadingOverlay {
     position: fixed;
