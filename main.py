@@ -110,16 +110,16 @@ def index():
     app_state["schedule_2"] = get_schedule("schedule_2.json")
     app_state["schedule_3"] = get_schedule("schedule_3.json")
 
-    # Check if the request is redirected from remove_slot
-    redirected = request.args.get('redirected', default=False, type=bool)
-    if redirected == False:
-        # Start audio process if it's not already running
-        if audio_process is None:
-            stop_audio_event.clear()
-            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-            audio_process.start()
-            app_state["audio_state"] = True
-            set_volume(app_state['volume'])
+    # # Check if the request is redirected from remove_slot
+    # redirected = request.args.get('redirected', default=False, type=bool)
+    # if redirected == False:
+    # Start audio process if it's not already running
+    if audio_process is None:
+        stop_audio_event.clear()
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True
+        set_volume(app_state['volume'])
 
     return render_template('index.html', app_state=app_state)
 
@@ -136,7 +136,7 @@ def upload_file():
 
         if start_time_seconds == "error":
             app_state["error"] = True
-            return redirect(url_for('index', redirected=True))
+            return render_template('index.html', app_state=app_state)
 
         app_state["error"] = False
         end_time_seconds = start_time_seconds + 45
@@ -156,9 +156,9 @@ def upload_file():
 
             update_app_state(song_subfolder, os.path.basename(filename))
             restart_audio_player()
-            return redirect(url_for('index', redirected=True))
+            return render_template('index.html', app_state=app_state)
 
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route to start audio playback
 @app.route('/start', methods=['POST', 'GET'])
@@ -175,7 +175,7 @@ def start():
         app_state["audio_state"] = True  
 
     # Render and return the index page with the updated application state
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route to stop audio playback
 @app.route('/stop', methods=['POST', 'GET'])
@@ -190,7 +190,7 @@ def stop():
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
 
     # Render and return the index page with the updated application state
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route for testing audio playback
 @app.route('/test', methods=['POST', 'GET'])
@@ -219,7 +219,7 @@ def test():
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
 
     # Render and return the index page with the updated application state
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route for changing the volume
 @app.route('/volume', methods=['POST','GET'])
@@ -229,7 +229,7 @@ def volume():
         new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
         set_volume(new_volume)
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route for adding a new time slot to the schedule
 @app.route('/add-slot', methods=['POST', 'GET'])
@@ -271,7 +271,7 @@ def add_slot():
         update_schedule(option+".json", schedule)
         restart_audio_player()
 
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route for removing a time slot to the schedule
 @app.route('/remove-slot', methods=['POST', 'GET'])
@@ -290,7 +290,7 @@ def remove_slot():
         app_state[option] = schedule
         update_schedule(option+".json", schedule)
         restart_audio_player()
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Flask route for changing the current loaded schedule
 @app.route('/load-schedule', methods = ['POST', 'GET'])
@@ -299,7 +299,7 @@ def load_schedule():
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
         restart_audio_player()
-    return redirect(url_for('index', redirected=True))
+    return render_template('index.html', app_state=app_state)
 
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":
