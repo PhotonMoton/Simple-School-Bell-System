@@ -69,6 +69,8 @@ div{
 .scheduleIndicator{
     background-color: #AAD9BB;
     border: 5px solid #80BCBD;
+    text-align: center;
+    font-weight: bold;
 }
 
 #loadingOverlay {
