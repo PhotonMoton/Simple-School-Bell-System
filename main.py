@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
 
 def sanitize_filename(filename):
     """
@@ -109,7 +109,9 @@ def index():
         app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
 
         # Update app state with the latest user edited schedule
-        app_state["schedule"] = get_schedule()
+        app_state["schedule_1"] = get_schedule("schedule_1.json")
+        app_state["schedule_2"] = get_schedule("schedule_2.json")
+        app_state["schedule_3"] = get_schedule("schedule_3.json")
 
         # Start audio process if it's not already running
         if audio_process is None:
@@ -234,7 +236,8 @@ def volume():
 def add_slot():
     global app_state
     if request.method == 'POST':
-        schedule = app_state["schedule"]
+        option = "schedule_"+app_state["schedule"]
+        schedule = app_state[option]
         
         # Get the new time from the front end in 24-hour format
         new_time_24hr = request.form.get('time')  # Expected in 24-hour format, e.g., "15:45"
@@ -264,8 +267,8 @@ def add_slot():
         schedule.insert(position, new_entry)
 
         # Make necessary updates
-        app_state["schedule"] = schedule
-        update_schedule(schedule)
+        app_state[option] = schedule
+        update_schedule(option, schedule)
         restart_audio_player()
 
     return redirect(url_for('index', redirected=True))
@@ -275,7 +278,8 @@ def add_slot():
 def remove_slot():
     global app_state
     if request.method == 'POST':
-        schedule = app_state["schedule"]
+        option = "schedule_"+app_state["schedule"]
+        schedule = app_state[option]
         
         # Get the time slot to delete from the front end and remove it
         to_delete = {"time":request.form.get('time'), "type":request.form.get('type')}
@@ -283,9 +287,18 @@ def remove_slot():
             schedule.remove(to_delete)
 
         # Make necessary updates
-        app_state["schedule"] = schedule
-        update_schedule(schedule)
+        app_state[option] = schedule
+        update_schedule(option, schedule)
         restart_audio_player()
+    return redirect(url_for('index', redirected=True))
+
+# Flask route for changing the current loaded schedule
+@app.route('/load-schedule', methods = ['POST', 'GET'])
+def load_schedule():
+    global app_state
+    if request.method == "POST":
+        app_state["schedule"] = request.form.get('option')
+    restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
 # Main block to run the Flask application on a specified host and port

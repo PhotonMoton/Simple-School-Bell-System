@@ -27,20 +27,20 @@ def create_schedule():
   ]
   return schedule
 
-def update_schedule(new_schedule):
-    with open('schedule.json', 'w') as file:
+def update_schedule(schedule, new_schedule):
+    with open(schedule, 'w') as file:
         json.dump(new_schedule, file)
 
-def get_schedule():
+def get_schedule(schedule):
     # Check if the schedule.json file exists
-    if not os.path.exists('schedule.json'):
+    if not os.path.exists(schedule):
     # If not, create a new schedule and save it to schedule.json
-        reset_schedule()
-    with open('schedule.json', 'r') as file:
+        reset_schedule(schedule)
+    with open(schedule, 'r') as file:
        return json.load(file)
 
-def reset_schedule():
-    with open('schedule.json', 'w') as file:
+def reset_schedule(schedule):
+    with open(schedule, 'w') as file:
         json.dump(create_schedule(), file)
 
 def delete_files_in_folder(folder_path):
