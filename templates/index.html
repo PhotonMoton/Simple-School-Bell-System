@@ -106,13 +106,13 @@
                                 </div>
                                 <div class="modal-body">
                                     <form action="/load-schedule" id="loadScheduleForm" method="post">
-                                        <select class="form-select scheduleSelector" aria-label="Schedule Selector">
+                                        <select class="form-select scheduleSelector" aria-label="Schedule Selector" name="option">
                                             <option class="scheduleOption" selected value="1">Schedule One</option>
                                             <option class="scheduleOption" value="2">Schedule Two</option>
                                             <option class="scheduleOption" value="3">Schedule Three</option>
                                         </select>
                                     </form>
-                                    {% for time_slot in app_state["schedule_"+app_state["schedule"] %}
+                                    {% for time_slot in app_state["schedule_"+app_state["schedule"]] %}
                                     <form action="/remove-slot" method="post">
                                         <!-- Jinja Loop to populate the Schedule -->
                                         <div class="row">
