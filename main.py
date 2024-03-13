@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": True, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
 
 def sanitize_filename(filename):
     """
@@ -97,9 +97,6 @@ def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
 
-    # # Check if the request is redirected from remove_slot
-    # redirected = request.args.get('redirected', default=False, type=bool)
-    # if redirected == False:
     # Determine paths for day and end song folders
     day_folder_path = os.path.join(app.root_path, 'static', 'day')
     end_folder_path = os.path.join(app.root_path, 'static', 'end')
@@ -113,13 +110,16 @@ def index():
     app_state["schedule_2"] = get_schedule("schedule_2.json")
     app_state["schedule_3"] = get_schedule("schedule_3.json")
 
-    # Start audio process if it's not already running
-    if audio_process is None and app_state["audio_state"] is False:
-        stop_audio_event.clear()
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-        audio_process.start()
-        app_state["audio_state"] = True
-        set_volume(app_state['volume'])
+    # Check if the request is redirected from remove_slot
+    redirected = request.args.get('redirected', default=False, type=bool)
+    if redirected == False:
+        # Start audio process if it's not already running
+        if audio_process is None:
+            stop_audio_event.clear()
+            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+            audio_process.start()
+            app_state["audio_state"] = True
+            set_volume(app_state['volume'])
 
     return render_template('index.html', app_state=app_state)
 
