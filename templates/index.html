@@ -245,6 +245,7 @@
         // Automatically submit a form whenever a volume is clicked
         document.querySelectorAll('.form-check-input').forEach(item => {
             item.addEventListener('change', function () {
+                showLoading();
                 document.getElementById('volumeForm').submit();
             });
         });
@@ -252,6 +253,7 @@
     <script>
         // Automatically submit the form whenever a new schedule is selected
         document.querySelector('.scheduleSelector').addEventListener('change', function() {
+            showLoading();
             document.getElementById('loadScheduleForm').submit();
         });
     </script>
