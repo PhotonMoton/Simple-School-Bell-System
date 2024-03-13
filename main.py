@@ -298,7 +298,7 @@ def load_schedule():
     global app_state
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
-    restart_audio_player()
+        restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
 # Main block to run the Flask application on a specified host and port
