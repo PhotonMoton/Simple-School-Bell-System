@@ -268,7 +268,7 @@ def add_slot():
 
         # Make necessary updates
         app_state[option] = schedule
-        update_schedule(option, schedule)
+        update_schedule(option+".json", schedule)
         restart_audio_player()
 
     return redirect(url_for('index', redirected=True))
@@ -288,7 +288,7 @@ def remove_slot():
 
         # Make necessary updates
         app_state[option] = schedule
-        update_schedule(option, schedule)
+        update_schedule(option+".json", schedule)
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
