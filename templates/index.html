@@ -162,16 +162,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        Test
-                        {{app_state["schedule"]}}
-                        {% if app_state["schedule"] == 1 %}
+                        {% if app_state["schedule"] == "1" %}
                         <p class="scheduleIndicator">Schedule One Loaded</p>
                         {% endif %}
-                        {% if app_state["schedule"] == 2 %}
+                        {% if app_state["schedule"] == "2" %}
                         <p class="scheduleIndicator">Schedule Two Loaded</p>
                         {% endif %}
-                        {% if app_state["schedule"] == 3 %}
+                        {% if app_state["schedule"] == "3" %}
                         <p class="scheduleIndicator">Schedule Three Loaded</p>
                         {% endif %}
                     </div>
