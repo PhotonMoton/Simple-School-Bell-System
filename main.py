@@ -114,6 +114,8 @@ def index():
     # redirected = request.args.get('redirected', default=False, type=bool)
     # if redirected == False:
     # Start audio process if it's not already running
+    print(audio_process)
+    print(app_state["audio_state"])
     if audio_process is None:
         stop_audio_event.clear()
         audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
@@ -188,7 +190,8 @@ def stop():
         stop_audio_event.set()  # Signal the process to stop
         audio_process.join()  # Wait for the process to finish
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
-
+    print(audio_process)
+    print(app_state["audio_state"])
     # Render and return the index page with the updated application state
     return render_template('index.html', app_state=app_state)
 
