@@ -54,7 +54,7 @@ def start_audio_player(stop_event):
     #Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     while not stop_event.is_set():
         current_time = datetime.now(pytz.timezone('US/Eastern')).strftime("%I:%M %p")
-        schedule = app_state["schedule_"+app_state["scedule"]]
+        schedule = app_state["schedule_"+app_state["schedule"]]
 
         for item in schedule:
             if item['time'] == current_time:
