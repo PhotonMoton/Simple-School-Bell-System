@@ -97,29 +97,29 @@ def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
 
-    # Check if the request is redirected from remove_slot
-    redirected = request.args.get('redirected', default=False, type=bool)
-    if redirected:
-        # Determine paths for day and end song folders
-        day_folder_path = os.path.join(app.root_path, 'static', 'day')
-        end_folder_path = os.path.join(app.root_path, 'static', 'end')
+    # # Check if the request is redirected from remove_slot
+    # redirected = request.args.get('redirected', default=False, type=bool)
+    # if redirected == False:
+    # Determine paths for day and end song folders
+    day_folder_path = os.path.join(app.root_path, 'static', 'day')
+    end_folder_path = os.path.join(app.root_path, 'static', 'end')
 
-        # Update app state with the latest song files from each folder
-        app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
-        app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
+    # Update app state with the latest song files from each folder
+    app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
+    app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
 
-        # Update app state with the latest user edited schedule
-        app_state["schedule_1"] = get_schedule("schedule_1.json")
-        app_state["schedule_2"] = get_schedule("schedule_2.json")
-        app_state["schedule_3"] = get_schedule("schedule_3.json")
+    # Update app state with the latest user edited schedule
+    app_state["schedule_1"] = get_schedule("schedule_1.json")
+    app_state["schedule_2"] = get_schedule("schedule_2.json")
+    app_state["schedule_3"] = get_schedule("schedule_3.json")
 
-        # Start audio process if it's not already running
-        if audio_process is None:
-            stop_audio_event.clear()
-            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-            audio_process.start()
-            app_state["audio_state"] = True
-            set_volume(app_state['volume'])
+    # Start audio process if it's not already running
+    if audio_process is None:
+        stop_audio_event.clear()
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True
+        set_volume(app_state['volume'])
 
     return render_template('index.html', app_state=app_state)
 
