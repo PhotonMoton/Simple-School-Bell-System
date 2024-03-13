@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": True, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
 
 def sanitize_filename(filename):
     """
@@ -114,7 +114,7 @@ def index():
     app_state["schedule_3"] = get_schedule("schedule_3.json")
 
     # Start audio process if it's not already running
-    if audio_process is None:
+    if audio_process is None and app_state["audio_state"] is False:
         stop_audio_event.clear()
         audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
         audio_process.start()
