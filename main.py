@@ -99,7 +99,7 @@ def index():
 
     # Check if the request is redirected from remove_slot
     redirected = request.args.get('redirected', default=False, type=bool)
-    if not redirected:
+    if redirected:
         # Determine paths for day and end song folders
         day_folder_path = os.path.join(app.root_path, 'static', 'day')
         end_folder_path = os.path.join(app.root_path, 'static', 'end')
