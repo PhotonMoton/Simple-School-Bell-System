@@ -141,13 +141,13 @@ def upload_file():
         if extension.lower() is not ".mp3":
             print(extension)
             app_state["error"][0] = True
-            return redirect(url_for('index', redirected=True))
+            return redirect(url_for('index', redirected=True, extension=extension))
         
         app_state["error"][0] = False
         
         if start_time_seconds == "error":
             app_state["error"][1] = True
-            return redirect(url_for('index', redirected=True))
+            return redirect(url_for('index', redirected=True, extension=extension))
         
         app_state["error"][0] = False
         app_state["error"][1] = False
