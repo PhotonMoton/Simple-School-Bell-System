@@ -14,7 +14,9 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": False, "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+# Error[0] is for File input error & Error[1] is for Start Time input error
+
 
 def sanitize_filename(filename):
     """
@@ -134,11 +136,17 @@ def upload_file():
         song_subfolder = request.form.get('selectedOption')
         start_time_seconds = time_to_seconds(request.form.get('start_time'))
 
-        if start_time_seconds == "error":
-            app_state["error"] = True
+        # Reload page with an error notification
+        if file == "error":
+            app_state["error"][0] = True
             return redirect(url_for('index', redirected=True))
 
-        app_state["error"] = False
+        if start_time_seconds == "error":
+            app_state["error"][1] = True
+            return redirect(url_for('index', redirected=True))
+
+        app_state["error"][0] = False
+        app_state["error"][1] = False
         end_time_seconds = start_time_seconds + 45
 
         if file:
