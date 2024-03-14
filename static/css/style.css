@@ -73,6 +73,12 @@ div{
     font-weight: bold;
 }
 
+.error{
+    background-color: red;
+    color: white;
+    font-size: large;
+}
+
 #loadingOverlay {
     position: fixed;
     top: 0;

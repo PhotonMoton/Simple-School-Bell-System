@@ -85,8 +85,11 @@
                             </svg>
                             {% endif %}
                         </div>
-                        {% if app_state["error"] %}
-                        <div>"Invalid time format. Please enter the time in HH:MM:SS format."</div>
+                        {% if app_state["error"][0] %}
+                        <div class = "error">"Invalid file format. Please upload an <strong>.mp3</strong> file."</div>
+                        {% endif %}
+                        {% if app_state["error"][1] %}
+                        <div class = "error">"Invalid time format. Please enter the time in HH:MM:SS format."</div>
                         {% endif %}
                     </div>
                 </div>
