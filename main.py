@@ -149,6 +149,7 @@ def upload_file():
             app_state["error"][1] = True
             return redirect(url_for('index', redirected=True, extension=extension))
         
+        app_state["error"]= [False, False]
         end_time_seconds = start_time_seconds + 45
 
         if file:
