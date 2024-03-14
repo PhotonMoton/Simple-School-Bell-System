@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "play_music":False, "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
 # Error[0] is for File input error & Error[1] is for Start Time input error
 
 
@@ -35,6 +35,14 @@ def sanitize_filename(filename):
     sanitized_filename = sanitized_base + extension
     
     return sanitized_filename
+
+# Function to ensure that the user doesn't run another route while the music is playing
+def music_check():
+    global app_state
+
+    if app_state["play_music"] == True:
+        return redirect(url_for('index', redirected=True))
+    return False
 
 # Function to get a list of files in a given folder
 def get_files_in_folder(folder_path):
@@ -64,9 +72,10 @@ def start_audio_player(stop_event):
                 filename = app_state[subfolder + "Song"]
                 audio_url = get_full_file_path(subfolder, filename)
                 subprocess.run(["mpg123", audio_url])
-
-                wait_time = 60 if item['type'] == 'day' else 300
+                app_state["play_music"] = True
+                wait_time = 60
                 time.sleep(wait_time)
+                app_state["play_music"] = False
 
         time.sleep(5)
 
@@ -131,6 +140,8 @@ def upload_file():
     #Handles file uploads, updates app state, and initiates audio processing for uploaded files
     global app_state, stop_audio_event, audio_process
 
+    music_check()
+
     app_state["error"]= [False, False]
 
     if request.method == 'POST':
@@ -146,7 +157,7 @@ def upload_file():
             return redirect(url_for('index', redirected=True))
         
         app_state["error"][0]= [False]
-        
+
         if start_time_seconds == "error":
             app_state["error"][1] = True
             return redirect(url_for('index', redirected=True))
@@ -179,6 +190,8 @@ def start():
     #Starts the audio playback process if it is not already running and updates the application state
     global audio_process, stop_audio_event, app_state
 
+    music_check()
+
     # Check if the audio process is not running and start it
     if audio_process is None or not audio_process.is_alive():
         stop_audio_event.clear()  # Reset the stop event
@@ -196,6 +209,8 @@ def stop():
     #Stops the audio playback process if it is running and updates the application state
     global audio_process, stop_audio_event, app_state
 
+    music_check()
+
     # Check if the audio process is running
     if audio_process and audio_process.is_alive():
         stop_audio_event.set()  # Signal the process to stop
@@ -210,6 +225,8 @@ def stop():
 def test():
     #Tests the audio playback functionality independently of the scheduled playback
     global app_state, audio_process
+
+    music_check()
 
     was_running= True
     # Start the audio process for testing if it's not already running
@@ -238,6 +255,9 @@ def test():
 @app.route('/volume', methods=['POST','GET'])
 def volume():
     global app_state
+
+    music_check()
+
     if request.method == 'POST':
         new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
@@ -248,6 +268,9 @@ def volume():
 @app.route('/add-slot', methods=['POST', 'GET'])
 def add_slot():
     global app_state
+
+    music_check()
+
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
         schedule = app_state[option]
@@ -290,6 +313,9 @@ def add_slot():
 @app.route('/remove-slot', methods=['POST', 'GET'])
 def remove_slot():
     global app_state
+
+    music_check()
+
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
         schedule = app_state[option]
@@ -309,6 +335,9 @@ def remove_slot():
 @app.route('/load-schedule', methods = ['POST', 'GET'])
 def load_schedule():
     global app_state
+
+    music_check()
+
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
         restart_audio_player()
