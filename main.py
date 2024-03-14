@@ -131,6 +131,8 @@ def upload_file():
     #Handles file uploads, updates app state, and initiates audio processing for uploaded files
     global app_state, stop_audio_event, audio_process
 
+    app_state["error"]= [False, False]
+
     if request.method == 'POST':
         file = request.files.get('file')
         song_subfolder = request.form.get('selectedOption')
@@ -143,14 +145,10 @@ def upload_file():
             app_state["error"][0] = True
             return redirect(url_for('index', redirected=True, extension=extension))
         
-        app_state["error"][0] = False
-        
         if start_time_seconds == "error":
             app_state["error"][1] = True
             return redirect(url_for('index', redirected=True, extension=extension))
         
-        app_state["error"][0] = False
-        app_state["error"][1] = False
         end_time_seconds = start_time_seconds + 45
 
         if file:
