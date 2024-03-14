@@ -6,7 +6,7 @@ This project is designed to automate the school bell system using a Raspberry Pi
 
 ## Interface
 
-1. Begin by typing in the IP address of the Raspberry Pi.  It should look like X.X.X.X:8080.  You can find the IP by referring to the [Control User Interface](#control-user-interface) section.
+1. Begin by typing in the IP address of the Raspberry Pi.  It should look like `X.X.X.X:8080`. Replace the `X` with the appropriate numbers which can be found by referring to the [Control User Interface](#control-user-interface) section.
 ![ssbs2](static/assets/ssbs2.png)
 
 
