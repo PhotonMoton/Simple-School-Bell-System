@@ -136,8 +136,9 @@ def upload_file():
         song_subfolder = request.form.get('selectedOption')
         start_time_seconds = time_to_seconds(request.form.get('start_time'))
 
-        # Reload page with an error notification
-        if file == "error":
+        # Reload page with an error notification if user input is not accepted
+        base_file, extension = os.path.splitext(file)
+        if extension is not ".mp3" or extension is not ".MP3":
             app_state["error"][0] = True
             return redirect(url_for('index', redirected=True))
 
