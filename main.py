@@ -138,7 +138,7 @@ def upload_file():
 
         # Reload page with an error notification if user input is not accepted
         base_file, extension = os.path.splitext(file.filename)
-        if extension is not ".mp3" or extension is not ".MP3":
+        if extension.lower() is not ".mp3":
             app_state["error"][0] = True
             return redirect(url_for('index', redirected=True))
         
