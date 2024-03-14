@@ -36,13 +36,13 @@ def sanitize_filename(filename):
     
     return sanitized_filename
 
-# Function to ensure that the user doesn't run another route while the music is playing
-def music_check():
-    global app_state
+# # Function to ensure that the user doesn't run another route while the music is playing
+# def music_check():
+#     global app_state
 
-    if app_state["play_music"] == True:
-        return redirect(url_for('index', redirected=True))
-    return False
+#     if app_state["play_music"] == True:
+#         return redirect(url_for('index', redirected=True))
+#     return False
 
 # Function to get a list of files in a given folder
 def get_files_in_folder(folder_path):
@@ -140,7 +140,7 @@ def upload_file():
     #Handles file uploads, updates app state, and initiates audio processing for uploaded files
     global app_state, stop_audio_event, audio_process
 
-    music_check()
+    # music_check()
 
     app_state["error"]= [False, False]
 
@@ -190,7 +190,7 @@ def start():
     #Starts the audio playback process if it is not already running and updates the application state
     global audio_process, stop_audio_event, app_state
 
-    music_check()
+    # music_check()
 
     # Check if the audio process is not running and start it
     if audio_process is None or not audio_process.is_alive():
@@ -209,7 +209,7 @@ def stop():
     #Stops the audio playback process if it is running and updates the application state
     global audio_process, stop_audio_event, app_state
 
-    music_check()
+    # music_check()
 
     # Check if the audio process is running
     if audio_process and audio_process.is_alive():
@@ -226,7 +226,7 @@ def test():
     #Tests the audio playback functionality independently of the scheduled playback
     global app_state, audio_process
 
-    music_check()
+    # music_check()
 
     was_running= True
     # Start the audio process for testing if it's not already running
@@ -256,7 +256,7 @@ def test():
 def volume():
     global app_state
 
-    music_check()
+    # music_check()
 
     if request.method == 'POST':
         new_volume = int(request.form.get('volume'))
@@ -269,7 +269,7 @@ def volume():
 def add_slot():
     global app_state
 
-    music_check()
+    # music_check()
 
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
@@ -314,7 +314,7 @@ def add_slot():
 def remove_slot():
     global app_state
 
-    music_check()
+    # music_check()
 
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
@@ -336,7 +336,7 @@ def remove_slot():
 def load_schedule():
     global app_state
 
-    music_check()
+    # music_check()
 
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')

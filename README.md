@@ -4,6 +4,19 @@
 
 This project is designed to automate the school bell system using a Raspberry Pi. It includes a Flask web application for controlling the bell schedule and managing bell songs. The system allows users to connect to the Raspberry Pi, run the school bell script, and control the user interface through a web browser.
 
+## Interface
+
+1. Begin by typing in the IP address of the Raspberry Pi.  It should look like X.X.X.X:8080.  You can find the IP by referring to the [Control User Interface](#control-user-interface) section.
+![ssbs2](static/assets/ssbs2.png)
+
+
+2. You can now access the application. Uploading an .mp3, setting a time-stamp for clipping, start/stop/test, and volume are all self explanatory.
+![ssbs1](static/assets/ssbs1.png)
+
+
+3. Clicking the `SCHEDULE` button will trigger a pop-up that will let you add and remove new time slots.  Clicking the dropdown will let you load a different schedule of which there are currently only three that you can keep saved.  The main page will let you know which Schedule is currently loaded.
+![ssbs3](static/assets/ssbs3.png)
+
 ## Getting Started
 
 ### Connect to Raspberry Pi
@@ -27,7 +40,7 @@ This project is designed to automate the school bell system using a Raspberry Pi
 
 ### Transfer or Download Files
 
-1. Download and extract all the files onto your Raspberry Pi
+1. Download and extract all the files onto your Raspberry Pi.
 
 2. You may need to transfer files over to the Raspberry Pi.  If so you can download the files as a zip.  Then you can transfer them like so:
     ```
@@ -145,10 +158,10 @@ To ensure that the School Bell Management System runs automatically on boot, fol
     
     ```
     if __name__ == "__main__":
-       app.run(host='0.0.0.0', port=8080)
+       app.run(host='X.X.X.X', port=8080)
     ```
 
-    Just replace `0.0.0.0` with the address you want the app to service. Most probably it will be the local address of the Raspberry Pi.
+    Just replace `X.X.X.X` with the address you want the app to service. Most probably it will be the local address of the Raspberry Pi.
 
 5. Save the file and exit the text editor.
 
@@ -176,13 +189,24 @@ To ensure that the School Bell Management System runs automatically on boot, fol
     sudo reboot
     ```
 
+10. If you make any changes to the code and you want to make sure the service is running correctly, make sure to type this:
+
+    ```
+    sudo systemctl daemon-reload
+    sudo systemctl reset schoolbell.service
+    ```
+
+11. You can check the status of the service with this:
+
+    ```
+    sudo systemctl status schoolbell.service
+    ```
+
 Now, the School Bell Management System should automatically start on boot.
 
 
 ## Future Updates
 
-1. Edit Schedule Panel - For now the only way to change the schedule is to edit the `models.py` file.
+1. Connect to an audio-clip api to facilitate song selection.  As of now you have to find and upload your own ".mp3" files.
 
-2. Connect to an audio-clip api to facilitate song selection.
-
-3. QOL/
+2. QOL

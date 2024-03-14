@@ -93,7 +93,7 @@ div{
     z-index: 1500;
 }
 
-#musicPlayingOverlay{
+/* #musicPlayingOverlay{
     position: fixed;
     top: 0;
     left: 0;
@@ -105,4 +105,4 @@ div{
     align-items: center;
     justify-content: center;
     z-index: 1500;
-}
+} */
