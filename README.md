@@ -7,20 +7,27 @@ This project is designed to automate the school bell system using a Raspberry Pi
 ## Interface
 
 1. Begin by typing in the IP address of the Raspberry Pi.  It should look like `X.X.X.X:8080`. Replace the `X` with the appropriate numbers which can be found by referring to the [Control User Interface](#control-user-interface) section.
-![ssbs2](static/assets/ssbs2.png)
+
+   ![ssbs2](static/assets/ssbs2.png)
 
 
 2. You can now access the application. Uploading an .mp3, setting a time-stamp for clipping, start/stop/test, and volume are all self explanatory.
-![ssbs1](static/assets/ssbs1.png)
+
+   ![ssbs1](static/assets/ssbs1.png)
 
 
 3. Clicking the `SCHEDULE` button will trigger a pop-up that will let you add and remove new time slots.  Clicking the dropdown will let you load a different schedule of which there are currently only three that you can keep saved.  The main page will let you know which Schedule is currently loaded.
-![ssbs3](static/assets/ssbs3.png)
+
+   ![ssbs3](static/assets/ssbs3.png)
 
 ## Getting Started
 
 ### Connect to Raspberry Pi
-1. Ensure that your Raspberry Pi is powered on and connected to the internet.
+1. Ensure that your Raspberry Pi is powered on.
+2. This guide assumes you have the following setup on your device:
+ - Raspberry Pi compatible Linux distribution
+ - Wi-Fi / Ethernet Adapter
+ - Audio Output
 
 #### Windows (using Cygwin):
 1. Open Cygwin or any other Unix CLI Emulator.
