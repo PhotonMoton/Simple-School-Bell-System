@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "play_music":False, "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": create_schedule(),"schedule_2":create_schedule(), "schedule_3":create_schedule()}  # App state dictionary
+app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "play_music":False, "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": get_schedule("schedule_1"),"schedule_2":get_schedule("schedule_2"), "schedule_3":get_schedule("schedule_3")}  # App state dictionary
 # Error[0] is for File input error & Error[1] is for Start Time input error
 
 
@@ -343,7 +343,7 @@ def add_schedule():
             num +=1
     num += 1
     schedule = f"schedule_{num}"
-    app_state[schedule] = get_schedule()
+    app_state[schedule] = get_schedule(schedule)
 
     app_state["schedule"] = num
     restart_audio_player()
