@@ -132,6 +132,7 @@ def index():
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
+    print(schedules)
 
     return render_template('index.html', app_state=app_state, schedules=schedules)
 
@@ -347,6 +348,7 @@ def add_schedule():
     app_state[schedule] = get_schedule(schedule)
 
     app_state["schedule"] = str(num)
+    print(num, schedule)
     restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
