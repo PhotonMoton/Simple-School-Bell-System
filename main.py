@@ -337,20 +337,21 @@ def remove_slot():
 @app.route('/add-schedule', methods=['POST'])
 def add_schedule():
     global app_state
-    schedule = ""
-    num = 0
-    for key in app_state:
-        if len(key) >= 9 and key[:8] == "schedule_":
-            schedule = key
-            num +=1
-    num += 1
-    schedule = f"schedule_{num}"
-    app_state[schedule] = get_schedule(schedule)
 
-    app_state["schedule"] = str(num)
-    print(num, schedule)
+    # Find the highest existing schedule number
+    schedule_numbers = [int(key.split('_')[1]) for key in app_state if key.startswith('schedule_')]
+    next_schedule_number = max(schedule_numbers) + 1 if schedule_numbers else 1
+
+    # Create the new schedule key
+    schedule_key = f"schedule_{next_schedule_number}"
+    app_state[schedule_key] = create_schedule()
+
+    # Update current schedule
+    app_state["schedule"] = str(next_schedule_number)
     restart_audio_player()
+
     return redirect(url_for('index', redirected=True))
+
 
 # Flask route for changing the current loaded schedule
 @app.route('/load-schedule', methods = ['POST', 'GET'])
