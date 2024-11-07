@@ -200,7 +200,7 @@ To ensure that the School Bell Management System runs automatically on boot, fol
 
     ```
     sudo systemctl daemon-reload
-    sudo systemctl reset schoolbell.service
+    sudo systemctl restart schoolbell.service
     ```
 
 11. You can check the status of the service with this:
