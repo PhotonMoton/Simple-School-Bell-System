@@ -108,7 +108,7 @@ def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
 
-    # Check if the request is redirected from remove_slot
+    # Check if the request is redirected from an already running instance
     redirected = request.args.get('redirected', default=False, type=bool)
     if not redirected:
         # Determine paths for day and end song folders
@@ -331,6 +331,24 @@ def remove_slot():
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
+# Flask route for adding a new schedule
+@app.route('/add-schedule', methods=['POST'])
+def add_schedule():
+    global app_state
+    schedule = ""
+    num = 0
+    for key in app_state:
+        if len(key) >= 9 and key[:8] == "schedule_":
+            schedule = key
+            num +=1
+    num += 1
+    schedule = f"schedule_{num}"
+    app_state[schedule] = get_schedule()
+
+    app_state["schedule"] = num
+    restart_audio_player()
+    return redirect(url_for('index', redirected=True))
+
 # Flask route for changing the current loaded schedule
 @app.route('/load-schedule', methods = ['POST', 'GET'])
 def load_schedule():
@@ -341,7 +359,7 @@ def load_schedule():
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
         restart_audio_player()
-    return render_template('index.html', app_state=app_state, redirected=True)
+    return redirect(url_for('index', redirected=True))
 
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":

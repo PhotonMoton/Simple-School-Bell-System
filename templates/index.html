@@ -119,13 +119,22 @@
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
+                                    <!-- Dynamic Schedule Selector -->
                                     <form action="/load-schedule" id="loadScheduleForm" method="post">
                                         <select class="form-select scheduleSelector" aria-label="Schedule Selector" name="option">
-                                            <option class="scheduleOption" value="1" {{ 'selected' if app_state["schedule"] == '1' else '' }}>Schedule One</option>
-                                            <option class="scheduleOption" value="2" {{ 'selected' if app_state["schedule"] == '2' else '' }}>Schedule Two</option>
-                                            <option class="scheduleOption" value="3" {{ 'selected' if app_state["schedule"] == '3' else '' }}>Schedule Three</option>
+                                            {% for schedule_name in schedules %}
+                                                {% set schedule_number = schedule_name.split('_')[1] %}
+                                                <option value="{{ schedule_number }}" {{ 'selected' if app_state["schedule"] == schedule_number else '' }}>
+                                                    Schedule {{ schedule_number }}
+                                                </option>
+                                            {% endfor %}
                                         </select>
                                     </form>
+                                    <!-- Add New Schedule Button -->
+                                    <form action="{{ url_for('add_schedule') }}" method="post" style="margin-top: 10px;">
+                                        <button type="submit" class="btn btn-secondary">Add New Schedule</button>
+                                    </form>
+                                    
                                     {% for time_slot in app_state["schedule_"+app_state["schedule"]] %}
                                     <form action="/remove-slot" method="post">
                                         <!-- Jinja Loop to populate the Schedule -->
@@ -177,15 +186,7 @@
                 </div>
                 <div class="row">
                     <div class = "col">
-                        {% if app_state["schedule"] == "1" %}
-                        <p class="scheduleIndicator">Schedule One Loaded</p>
-                        {% endif %}
-                        {% if app_state["schedule"] == "2" %}
-                        <p class="scheduleIndicator">Schedule Two Loaded</p>
-                        {% endif %}
-                        {% if app_state["schedule"] == "3" %}
-                        <p class="scheduleIndicator">Schedule Three Loaded</p>
-                        {% endif %}
+                        <p class="scheduleIndicator">{% app_state["schedule"] %} Loaded</p>
                     </div>
                 </div>
             </div>
