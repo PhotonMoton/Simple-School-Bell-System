@@ -131,8 +131,9 @@ def index():
             audio_process.start()
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
+    schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
 
-    return render_template('index.html', app_state=app_state)
+    return render_template('index.html', app_state=app_state, schedules=schedules)
 
 # Flask route for uploading files
 @app.route('/upload', methods=['POST', 'GET'])
@@ -345,7 +346,7 @@ def add_schedule():
     schedule = f"schedule_{num}"
     app_state[schedule] = get_schedule(schedule)
 
-    app_state["schedule"] = num
+    app_state["schedule"] = str(num)
     restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
