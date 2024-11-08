@@ -357,7 +357,7 @@ def add_schedule():
 def remove_schedule():
     global app_state
 
-    schedule = int(request.form.get('del_sched'))
+    schedule = app_state["schedule"]
     schedule_filename = f"schedule_{schedule}.json"
     if schedule > 3:
         delete_schedule(schedule_filename)
