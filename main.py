@@ -363,7 +363,7 @@ def remove_schedule():
         delete_schedule(schedule_filename)
         app_state.pop(f"schedule_{schedule}")
         app_state["schedule"] = "1"
-
+    return redirect(url_for('index', redirected=True))
 
 
 # Flask route for changing the current loaded schedule
