@@ -43,6 +43,13 @@ def reset_schedule(schedule):
     with open(schedule, 'w') as file:
         json.dump(create_schedule(), file)
 
+def delete_schedule(schedule):
+    try:
+        if os.path.isfile(schedule):
+            os.unlink(schedule)
+    except Exception as e:
+        print(f"Error deleting {schedule}: {e}")
+
 def delete_files_in_folder(folder_path):
   # Get a list of all files in the folder
   files = os.listdir(folder_path)

@@ -130,11 +130,20 @@
                                             {% endfor %}
                                         </select>
                                     </form>
-                                    <!-- Add New Schedule Button -->
-                                    <form action="{{ url_for('add_schedule') }}" method="post" style="margin-top: 10px;">
-                                        <button type="submit" class="btn btn-secondary">Add New Schedule</button>
-                                    </form>
-                                    
+                                    <!-- Add New Schedule Button or Remove Schedule-->
+                                    <div class="row">
+                                        <div class="col">
+                                            <form action="{{ url_for('add_schedule') }}" method="post" style="margin-top: 10px;">
+                                                <button type="submit" class="btn btn-secondary">Add New Schedule</button>
+                                            </form>
+                                        </div>
+                                        <div class="col">
+                                            <form action="{{ url_for('remove_schedule') }}" method="post" style="margin-top: 10px;">
+                                                <button name="del_sched" type="submit" class="btn btn-danger" value="{{ app_state[schedule] }}">Add New Schedule</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                  
                                     {% for time_slot in app_state["schedule_"+app_state["schedule"]] %}
                                     <form action="/remove-slot" method="post">
                                         <!-- Jinja Loop to populate the Schedule -->
@@ -186,7 +195,7 @@
                 </div>
                 <div class="row">
                     <div class = "col">
-                        <p class="scheduleIndicator">{{ app_state["schedule"] }} Loaded</p>
+                        <p class="scheduleIndicator">Schedule {{ app_state["schedule"] }} Loaded</p>
                     </div>
                 </div>
             </div>

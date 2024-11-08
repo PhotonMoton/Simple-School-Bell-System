@@ -1,6 +1,6 @@
 import subprocess  # For executing shell commands
 from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
-from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule 
+from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule
 from datetime import datetime  # For handling date and time operations
 import multiprocessing  # For parallel execution
 import pytz  # For timezone conversions
@@ -351,6 +351,19 @@ def add_schedule():
     restart_audio_player()
 
     return redirect(url_for('index', redirected=True))
+
+# Flask route for removing schedule
+@app.route('/remove-schedule', methods=['POST', 'GET'])
+def remove_schedule():
+    global app_state
+
+    schedule = int(request.form.get('del_sched'))
+    schedule_filename = f"schedule_{schedule}.json"
+    if schedule > 3:
+        delete_schedule(schedule_filename)
+        app_state.pop(f"schedule_{schedule}")
+        app_state["schedule"] = "1"
+
 
 
 # Flask route for changing the current loaded schedule
