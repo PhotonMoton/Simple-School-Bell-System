@@ -357,7 +357,7 @@ def add_schedule():
 def remove_schedule():
     global app_state
 
-    schedule = app_state["schedule"]
+    schedule = int(app_state["schedule"])
     schedule_filename = f"schedule_{schedule}.json"
     if schedule > 3:
         delete_schedule(schedule_filename)
