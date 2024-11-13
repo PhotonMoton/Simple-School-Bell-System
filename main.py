@@ -145,8 +145,6 @@ def upload_file():
     #Handles file uploads, updates app state, and initiates audio processing for uploaded files
     global app_state, stop_audio_event, audio_process
 
-    # music_check()
-
     app_state["error"]= [False, False]
 
     if request.method == 'POST':
@@ -195,8 +193,6 @@ def start():
     #Starts the audio playback process if it is not already running and updates the application state
     global audio_process, stop_audio_event, app_state
 
-    # music_check()
-
     # Check if the audio process is not running and start it
     if audio_process is None or not audio_process.is_alive():
         stop_audio_event.clear()  # Reset the stop event
@@ -214,8 +210,6 @@ def stop():
     #Stops the audio playback process if it is running and updates the application state
     global audio_process, stop_audio_event, app_state
 
-    # music_check()
-
     # Check if the audio process is running
     if audio_process and audio_process.is_alive():
         stop_audio_event.set()  # Signal the process to stop
@@ -230,8 +224,6 @@ def stop():
 def test():
     #Tests the audio playback functionality independently of the scheduled playback
     global app_state, audio_process
-
-    # music_check()
 
     was_running= True
     # Start the audio process for testing if it's not already running
@@ -261,8 +253,6 @@ def test():
 def volume():
     global app_state
 
-    # music_check()
-
     if request.method == 'POST':
         new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
@@ -273,8 +263,6 @@ def volume():
 @app.route('/add-slot', methods=['POST', 'GET'])
 def add_slot():
     global app_state
-
-    # music_check()
 
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
@@ -319,8 +307,6 @@ def add_slot():
 def remove_slot():
     global app_state
 
-    # music_check()
-
     if request.method == 'POST':
         option = "schedule_"+app_state["schedule"]
         schedule = app_state[option]
@@ -347,7 +333,7 @@ def add_schedule():
 
     # Create the new schedule key
     schedule_key = f"schedule_{next_schedule_number}"
-    app_state[schedule_key] = get_schedule(schedule_key)
+    app_state[schedule_key] = get_schedule(f"{schedule_key}.json")
 
     # Update current schedule
     app_state["schedule"] = str(next_schedule_number)
@@ -366,6 +352,7 @@ def remove_schedule():
         delete_schedule(schedule_filename)
         app_state.pop(f"schedule_{schedule}")
         app_state["schedule"] = "1"
+        restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
 
@@ -373,8 +360,6 @@ def remove_schedule():
 @app.route('/load-schedule', methods = ['POST', 'GET'])
 def load_schedule():
     global app_state
-
-    # music_check()
 
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
