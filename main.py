@@ -14,7 +14,19 @@ app = Flask(__name__, static_url_path='/static')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
-app_state = {"daySong": 'test', "endSong": None, "app_state": 'test', "play_music":False, "audio_state": False, "error": [False, False], "volume": 75, "schedule":"1", "schedule_1": get_schedule("schedule_1"),"schedule_2":get_schedule("schedule_2"), "schedule_3":get_schedule("schedule_3")}  # App state dictionary
+app_state = {
+                "daySong": 'test', 
+                "endSong": None, 
+                "app_state": 'test', 
+                "play_music":False, 
+                "audio_state": False, 
+                "error": [False, False], 
+                "volume": 75, 
+                "schedule":"1", 
+                "schedule_1": get_schedule("schedule_1.json"),
+                "schedule_2":get_schedule("schedule_2.json"), 
+                "schedule_3":get_schedule("schedule_3.json")
+            }  # App state dictionary
 # Error[0] is for File input error & Error[1] is for Start Time input error
 
 
@@ -35,14 +47,6 @@ def sanitize_filename(filename):
     sanitized_filename = sanitized_base + extension
     
     return sanitized_filename
-
-# # Function to ensure that the user doesn't run another route while the music is playing
-# def music_check():
-#     global app_state
-
-#     if app_state["play_music"] == True:
-#         return redirect(url_for('index', redirected=True))
-#     return False
 
 # Function to get a list of files in a given folder
 def get_files_in_folder(folder_path):
@@ -132,7 +136,6 @@ def index():
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
-    print(schedules)
 
     return render_template('index.html', app_state=app_state, schedules=schedules)
 
@@ -344,7 +347,7 @@ def add_schedule():
 
     # Create the new schedule key
     schedule_key = f"schedule_{next_schedule_number}"
-    app_state[schedule_key] = create_schedule()
+    app_state[schedule_key] = get_schedule(schedule_key)
 
     # Update current schedule
     app_state["schedule"] = str(next_schedule_number)
