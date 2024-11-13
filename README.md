@@ -16,7 +16,7 @@ This project is designed to automate the school bell system using a Raspberry Pi
    ![ssbs1](static/assets/ssbs1.png)
 
 
-3. Clicking the `SCHEDULE` button will trigger a pop-up that will let you add and remove new time slots.  Clicking the dropdown will let you load a different schedule of which there are currently only three that you can keep saved.  The main page will let you know which Schedule is currently loaded.
+3. Clicking the `SCHEDULE` button will trigger a pop-up that will let you add and remove new time slots.  Clicking the dropdown will let you load a different schedule.  Here you can add a new schedule or delete the currently selected schedule.  The main page will let you know which Schedule is currently loaded.
 
    ![ssbs3](static/assets/ssbs3.png)
 

@@ -23,7 +23,7 @@ app_state = {
                 "error": [False, False], 
                 "volume": 75, 
                 "schedule":"1", 
-                "schedule_1": get_schedule("schedule_1.json"),
+                "schedule_1":get_schedule("schedule_1.json"),
                 "schedule_2":get_schedule("schedule_2.json"), 
                 "schedule_3":get_schedule("schedule_3.json")
             }  # App state dictionary
