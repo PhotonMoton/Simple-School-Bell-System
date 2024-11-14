@@ -36,9 +36,9 @@ def load_schedules():
     files = os.listdir()
     for file in files:
         filename = file
-        if file.startswith('schedule_') and int(file.split('_')[1])>3:
+        if file.startswith('schedule_') and file.endswith(".json") and int(file.split('_')[1])>3:
             try:
-                schedules[file]=get_schedule(f"{filename}.json")
+                schedules[filename]=get_schedule(f"{filename}")
             except Exception as e:
                 print(f"Error adding {filename}: {e}")
     return schedules
