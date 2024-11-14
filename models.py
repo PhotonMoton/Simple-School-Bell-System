@@ -31,6 +31,17 @@ def update_schedule(schedule, new_schedule):
     with open(schedule, 'w') as file:
         json.dump(new_schedule, file)
 
+def load_schedules():
+    schedules = {}
+    files = os.listdir()
+    for file in files:
+        if file.startswith('schedule_') and int(file.split('_')[1])>3:
+            try:
+                schedules[file]=get_schedule(f"{file}.json")
+            except Exception as e:
+                print(f"Error adding {file}: {e}")
+    return schedules
+
 def get_schedule(schedule):
     # Check if the schedule.json file exists
     if not os.path.exists(schedule):

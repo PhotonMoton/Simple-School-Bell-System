@@ -1,6 +1,6 @@
 import subprocess  # For executing shell commands
 from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
-from models import delete_files_in_folder, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule
+from models import delete_files_in_folder, load_schedules, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule
 from datetime import datetime  # For handling date and time operations
 import multiprocessing  # For parallel execution
 import pytz  # For timezone conversions
@@ -106,6 +106,7 @@ def set_volume(volume):
     subprocess.run(['amixer', 'set', 'Master', f'{volume}%'])
 
 
+
 # Flask route for the index page
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -123,10 +124,12 @@ def index():
         app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
         app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
 
-        # Update app state with the latest user edited schedule
+        # Update app state with the latest user edited schedules
         app_state["schedule_1"] = get_schedule("schedule_1.json")
         app_state["schedule_2"] = get_schedule("schedule_2.json")
         app_state["schedule_3"] = get_schedule("schedule_3.json")
+        for key, value in load_schedules().items():
+            app_state[key] = value
 
         # Start audio process if it's not already running
         if audio_process is None:
