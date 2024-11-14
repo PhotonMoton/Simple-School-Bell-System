@@ -35,11 +35,12 @@ def load_schedules():
     schedules = {}
     files = os.listdir()
     for file in files:
+        filename = file
         if file.startswith('schedule_') and int(file.split('_')[1])>3:
             try:
-                schedules[file]=get_schedule(f"{file}.json")
+                schedules[file]=get_schedule(f"{filename}.json")
             except Exception as e:
-                print(f"Error adding {file}: {e}")
+                print(f"Error adding {filename}: {e}")
     return schedules
 
 def get_schedule(schedule):
