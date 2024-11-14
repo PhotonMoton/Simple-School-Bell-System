@@ -128,8 +128,8 @@ def index():
         app_state["schedule_1"] = get_schedule("schedule_1.json")
         app_state["schedule_2"] = get_schedule("schedule_2.json")
         app_state["schedule_3"] = get_schedule("schedule_3.json")
-        # for key, value in load_schedules().items():
-        #     app_state[key] = value
+        for key, value in load_schedules().items():
+            app_state[key] = value
 
         # Start audio process if it's not already running
         if audio_process is None:
