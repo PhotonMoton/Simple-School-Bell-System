@@ -1,5 +1,7 @@
 import os
 import json
+import vlc
+import time
 from pydub import AudioSegment
 from datetime import datetime
 
@@ -26,6 +28,26 @@ def create_schedule():
     {"time":"03:05 PM", "type":"end"} 
   ]
   return schedule
+
+def load_schedule_names():
+    if not os.path.exists("schedule_names.json"):
+        with open("schedule_names.json", 'w') as file:
+            json.dump([
+                {"schedule_1", "schedule_1"},
+                {"schedule_2", "schedule_2"},
+                {"schedule_3", "schedule_3"},
+                ], file)
+    with open("schedule_names.json", 'r') as file:
+       return json.load(file)
+
+def change_schedule_name(schedule, new_name):
+    if not os.path.exists("schedule_names.json"):
+        load_schedule_names()
+    with open("schedule_names.json", 'r') as file:
+        schedules = json.load(file)
+        schedules[schedule] = new_name
+    with open("schedule_names.json", 'w') as file:
+        json.dump(schedules, file)
 
 def update_schedule(schedule, new_schedule):
     with open(schedule, 'w') as file:
@@ -102,3 +124,8 @@ def time_to_seconds(time_str):
         # Handle the case where the input time format is invalid
         return "error"
 
+def play_audio_stream(url):
+    player = vlc.MediaPlayer(url)
+    player.play()
+    time.sleep(45)  # Play for 45 seconds
+    player.stop()

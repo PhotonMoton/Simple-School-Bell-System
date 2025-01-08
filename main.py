@@ -1,12 +1,13 @@
 import subprocess  # For executing shell commands
 from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
-from models import delete_files_in_folder, load_schedules, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule
+from models import delete_files_in_folder, load_schedules, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule, play_audio_stream, load_schedule_names, change_schedule_name
 from datetime import datetime  # For handling date and time operations
 import multiprocessing  # For parallel execution
 import pytz  # For timezone conversions
 import time  # For sleep/delay operations
 import os  # For file system operations
 import re # For sanitizing filenames
+
 
 # Initialize Flask app with a specific static_url_path
 app = Flask(__name__, static_url_path='/static')
@@ -22,13 +23,12 @@ app_state = {
                 "audio_state": False, 
                 "error": [False, False], 
                 "volume": 75, 
-                "schedule":"1", 
+                "schedule":"1",
+                "schedule_names": load_schedule_names, 
                 "schedule_1":get_schedule("schedule_1.json"),
                 "schedule_2":get_schedule("schedule_2.json"), 
                 "schedule_3":get_schedule("schedule_3.json")
             }  # App state dictionary
-# Error[0] is for File input error & Error[1] is for Start Time input error
-
 
 def sanitize_filename(filename):
     """
@@ -367,6 +367,25 @@ def load_schedule():
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
         restart_audio_player()
+    return redirect(url_for('index', redirected=True))
+    
+# Flask route for changing the schedule name
+@app.route('/name_schedule', methods = ['POST', 'GET'])
+def name_schedule():
+    global app_state
+
+    schedule_name = f"schedule_{int(app_state["schedule"])}"
+    new_schedule_name = request.form.get('name')
+    change_schedule_name(schedule_name, new_schedule_name)
+    app_state['schedule_names']=load_schedule_names
+    return redirect(url_for('index', redirected=True))
+
+# Flask route to play youtube audio
+@app.route('/play', methods=['POST', 'GET'])
+def play_audio():
+    youtube_url = request.form['url']
+    audio_url = get_audio_url(youtube_url)
+    play_audio_stream(audio_url)
     return redirect(url_for('index', redirected=True))
 
 # Main block to run the Flask application on a specified host and port

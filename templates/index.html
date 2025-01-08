@@ -125,7 +125,7 @@
                                             {% for schedule_name in schedules %}
                                                 {% set schedule_number = schedule_name.split('_')[1] %}
                                                 <option value="{{ schedule_number }}" {{ 'selected' if app_state["schedule"] == schedule_number else '' }}>
-                                                    Schedule {{ schedule_number }}
+                                                    {{ schedule_names[schedule_name] }}
                                                 </option>
                                             {% endfor %}
                                         </select>
@@ -134,8 +134,32 @@
                                     <div class="row">
                                         <div class="col">
                                             <form action="{{ url_for('add_schedule') }}" method="post" style="margin-top: 10px;">
-                                                <button type="submit" class="btn btn-secondary">Add New Schedule</button>
+                                                <button type="submit" class="btn btn-primary">Add New Schedule</button>
                                             </form>
+                                        </div>
+                                        <div class="col">
+                                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changeNameModal" style="margin-top: 10px;">
+                                                Change Name
+                                            </button>
+                                            <div class="modal fade" id="changeNameModal" tabindex="-1" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="changeNameModalLabel">Change Name</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="nameForm" action="{{ url_for('name_schedule') }}" method="post">
+                                                                <div class="mb-3">
+                                                                    <label for="newName" class="form-label">Enter New Name</label>
+                                                                    <input type="text" class="form-control" id="newName" placeholder="Type a new name" name="name" required>
+                                                                </div>
+                                                                <button type="submit" class="btn btn-success">Save</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col">
                                             <form action="{{ url_for('remove_schedule') }}" method="post" style="margin-top: 10px;">
@@ -195,7 +219,7 @@
                 </div>
                 <div class="row">
                     <div class = "col">
-                        <p class="scheduleIndicator">Schedule {{ app_state["schedule"] }} Loaded</p>
+                        <p class="scheduleIndicator">{{ app_state["schedule_names"]["schedule_"+app_state["schedule"]] }} Loaded</p>
                     </div>
                 </div>
             </div>

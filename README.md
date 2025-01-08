@@ -66,8 +66,12 @@ You can replace "admin" with whatever the account is that is running the script 
 2. Start the virtual environment. Enter:
    ```
    . .venv/bin/activate
+   
    ```
 3. Install Flask and all of the dependancies in `recquirements.txt`:
+   ```
+   pip install -r requirements.txt
+   ```
 
 4. Run the script:
    ```
