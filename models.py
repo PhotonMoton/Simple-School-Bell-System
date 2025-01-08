@@ -33,11 +33,11 @@ def load_schedule_names():
     if not os.path.exists("schedule_names.json"):
         print("creating file")
         with open("schedule_names.json", 'w') as file:
-            schedule_names = [
-                {"schedule_1", "schedule_1"},
-                {"schedule_2", "schedule_2"},
-                {"schedule_3", "schedule_3"},
-                ]
+            schedule_names = {
+                "schedule_1": "schedule_1",
+                "schedule_2": "schedule_2",
+                "schedule_3": "schedule_3",
+                }
             json.dump(schedule_names, file)
     with open("schedule_names.json", 'r') as file:
        print("file loaded")
