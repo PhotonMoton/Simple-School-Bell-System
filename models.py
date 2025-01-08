@@ -30,27 +30,27 @@ def create_schedule():
 
 def load_schedule_names():
     print("loading")
-    if not os.path.exists("schedule_names.json"):
+    if not os.path.exists("sched_names.json"):
         print("creating file")
-        with open("schedule_names.json", 'w') as file:
+        with open("sched_names.json", 'w') as file:
             schedule_names = {
                 "schedule_1": "schedule_1",
                 "schedule_2": "schedule_2",
                 "schedule_3": "schedule_3",
                 }
             json.dump(schedule_names, file)
-    with open("schedule_names.json", 'r') as file:
+    with open("sched_names.json", 'r') as file:
        print("file loaded")
        print(file)
        return json.load(file)
 
 def change_schedule_name(schedule, new_name):
-    if not os.path.exists("schedule_names.json"):
+    if not os.path.exists("sched_names.json"):
         load_schedule_names()
-    with open("schedule_names.json", 'r') as file:
+    with open("sched_names.json", 'r') as file:
         schedules = json.load(file)
         schedules[schedule] = new_name
-    with open("schedule_names.json", 'w') as file:
+    with open("sched_names.json", 'w') as file:
         json.dump(schedules, file)
 
 def update_schedule(schedule, new_schedule):
