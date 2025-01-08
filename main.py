@@ -373,8 +373,8 @@ def load_schedule():
 @app.route('/name_schedule', methods = ['POST', 'GET'])
 def name_schedule():
     global app_state
-
-    schedule_name = f"schedule_{int(app_state["schedule"])}"
+    schedule_num = int(app_state["schedule"])
+    schedule_name = f"schedule_{schedule_num}"
     new_schedule_name = request.form.get('name')
     change_schedule_name(schedule_name, new_schedule_name)
     app_state['schedule_names']=load_schedule_names
