@@ -125,7 +125,7 @@
                                             {% for schedule_name in schedules %}
                                                 {% set schedule_number = schedule_name.split('_')[1] %}
                                                 <option value="{{ schedule_number }}" {{ 'selected' if app_state["schedule"] == schedule_number else '' }}>
-                                                    {{ schedule_names[schedule_name] }}
+                                                    {{ app_state["schedule_names"][schedule_name] }}
                                                 </option>
                                             {% endfor %}
                                         </select>
