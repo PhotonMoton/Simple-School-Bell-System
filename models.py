@@ -40,7 +40,7 @@ def load_schedule_names():
                 ], file)
     with open("schedule_names.json", 'r') as file:
        print("file loaded")
-       print(json.load(file))
+       print(file)
        return json.load(file)
 
 def change_schedule_name(schedule, new_name):
