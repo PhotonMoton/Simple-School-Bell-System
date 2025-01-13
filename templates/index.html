@@ -48,8 +48,7 @@
                         <div class="row">
                             <div id="timeHelpBlock" class="form-text">
                                 Start Time (A 45-second segment will be generated from that time stamp.) Make sure to
-                                input the time in the format "HH:MM:SS" (hours:minutes:seconds)
-                            </br>
+                                input the time in the format "HH:MM:SS" (hours:minutes:seconds)</br>
                                 *NOTE* END songs will play the full duration and ignore the start time.
                             </div>
                             <div class="input-group mb-3">
@@ -60,6 +59,7 @@
                         </div>
                     </form>
                 </div>
+
                 <div class="row">
                     <div id="startHelpBlock" class="form-text">
                         Start or Stop the program. Test will run the day song once on press.
@@ -97,19 +97,23 @@
                             {% endif %}
                         </div>
                         {% if app_state["error"][0] %}
-                        <div class = "error">"Invalid file format. Please upload an <strong>.mp3</strong> file."</div>
+                        <div class="error">"Invalid file format. Please upload an <strong>.mp3</strong> file."</div>
                         {% endif %}
                         {% if app_state["error"][1] %}
-                        <div class = "error">"Invalid time format. Please enter the time in HH:MM:SS format."</div>
+                        <div class="error">"Invalid time format. Please enter the time in HH:MM:SS format."</div>
                         {% endif %}
                     </div>
                 </div>
+
                 <div class="row">
                     <div class="col">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+                        <!-- Button to open the SCHEDULE modal -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#scheduleModal">
                             SCHEDULE
                         </button>
                     </div>
+                    <!-- SCHEDULE Modal -->
                     <div class="modal" tabindex="-1" id="scheduleModal">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
@@ -121,60 +125,68 @@
                                 <div class="modal-body">
                                     <!-- Dynamic Schedule Selector -->
                                     <form action="/load-schedule" id="loadScheduleForm" method="post">
-                                        <select class="form-select scheduleSelector" aria-label="Schedule Selector" name="option">
+                                        <select class="form-select scheduleSelector" aria-label="Schedule Selector"
+                                            name="option">
                                             {% for schedule_name in schedules %}
-                                                {% set schedule_number = schedule_name.split('_')[1] %}
-                                                <option value="{{ schedule_number }}" {{ 'selected' if app_state["schedule"] == schedule_number else '' }}>
-                                                    {{ app_state["schedule_names"][schedule_name] }}
-                                                </option>
+                                            {% set schedule_number = schedule_name.split('_')[1] %}
+                                            <option value="{{ schedule_number }}" {{ 'selected' if
+                                                app_state["schedule"]==schedule_number else '' }}>
+                                                {{ app_state["schedule_names"][schedule_name] }}
+                                            </option>
                                             {% endfor %}
                                         </select>
                                     </form>
-                                    <!-- Add New Schedule Button or Remove Schedule-->
+
                                     <div class="row">
+                                        <!-- Add New Schedule -->
                                         <div class="col">
-                                            <form action="{{ url_for('add_schedule') }}" method="post" style="margin-top: 10px;">
+                                            <form action="{{ url_for('add_schedule') }}" method="post"
+                                                style="margin-top: 10px;">
                                                 <button type="submit" class="btn btn-primary">Add New Schedule</button>
                                             </form>
                                         </div>
+
+                                        <!-- Inline Change Name (replaces old modal) -->
                                         <div class="col">
-                                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changeNameModal" style="margin-top: 10px;">
+                                            <!-- This button toggles the text form -->
+                                            <button class="btn btn-primary" id="changeNameBtn" style="margin-top: 10px;"
+                                                onclick="toggleChangeNameForm()">
                                                 Change Name
                                             </button>
-                                            <div class="modal fade" id="changeNameModal" tabindex="-1" aria-labelledby="changeNameModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="changeNameModalLabel">Change Name</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <form id="nameForm" action="{{ url_for('name_schedule') }}" method="post">
-                                                                <div class="mb-3">
-                                                                    <label for="newName" class="form-label">Enter New Name</label>
-                                                                    <input type="text" class="form-control" id="newName" placeholder="Type a new name" name="name" required>
-                                                                </div>
-                                                                <button type="submit" class="btn btn-success">Save</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
+
+                                            <!-- Hidden inline form that appears after the button is clicked -->
+                                            <form id="changeNameForm" action="{{ url_for('name_schedule') }}"
+                                                method="post" style="display: none; margin-top: 10px;"
+                                                onsubmit="showLoading()">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" name="name"
+                                                        placeholder="Type a new name" required />
+                                                    <button type="submit" class="btn btn-success">Confirm</button>
                                                 </div>
-                                            </div>
+                                            </form>
                                         </div>
+
+                                        <!-- Remove Schedule -->
                                         <div class="col">
-                                            <form action="{{ url_for('remove_schedule') }}" method="post" style="margin-top: 10px;">
-                                                <button type="submit" class="btn btn-danger" >Remove Schedule</button>
+                                            <form action="{{ url_for('remove_schedule') }}" method="post"
+                                                style="margin-top: 10px;">
+                                                <button type="submit" class="btn btn-danger">Remove Schedule</button>
                                             </form>
                                         </div>
                                     </div>
-                  
+
+                                    <!-- Show existing schedule time slots -->
                                     {% for time_slot in app_state["schedule_"+app_state["schedule"]] %}
                                     <form action="/remove-slot" method="post">
-                                        <!-- Jinja Loop to populate the Schedule -->
                                         <div class="row">
                                             <div class="col-10">
-                                                <p class="schedule">TIME: <span style="color:blue;"><strong>{{time_slot["time"]}}</strong></span> TYPE:
-                                                    <span style="color: brown;"><strong>{{time_slot["type"]}}</strong></span></p>
+                                                <p class="schedule">TIME:
+                                                    <span
+                                                        style="color:blue;"><strong>{{time_slot["time"]}}</strong></span>
+                                                    TYPE:
+                                                    <span
+                                                        style="color: brown;"><strong>{{time_slot["type"]}}</strong></span>
+                                                </p>
                                                 <!-- Hidden inputs for time and type -->
                                                 <input type="hidden" name="time" value="{{ time_slot['time'] }}">
                                                 <input type="hidden" name="type" value="{{ time_slot['type'] }}">
@@ -185,8 +197,9 @@
                                         </div>
                                     </form>
                                     {% endfor %}
-                                    <form action="/add-slot" method="post">
 
+                                    <!-- Add new time slot -->
+                                    <form action="/add-slot" method="post">
                                         <div class="row addSlot">
                                             <div class="col-5">
                                                 <div class="form-group">
@@ -195,12 +208,13 @@
                                                 </div>
                                             </div>
                                             <div class="col-5" style="padding: 0;">
-                                                <div class="row ">
-                                                    <div class="col-2 ">
+                                                <div class="row">
+                                                    <div class="col-2">
                                                         <label for="type">Type:</label>
                                                     </div>
                                                     <div class="col-10">
-                                                        <select class="form-select" id="type" name="type" required aria-label="day or end selector">
+                                                        <select class="form-select" id="type" name="type" required
+                                                            aria-label="day or end selector">
                                                             <option selected>day</option>
                                                             <option value="end">end</option>
                                                         </select>
@@ -217,9 +231,12 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row">
-                    <div class = "col">
-                        <p class="scheduleIndicator">{{ app_state["schedule_names"]["schedule_"+app_state["schedule"]] }} Loaded</p>
+                    <div class="col">
+                        <p class="scheduleIndicator">
+                            {{ app_state["schedule_names"]["schedule_"+app_state["schedule"]] }} Loaded
+                        </p>
                     </div>
                 </div>
             </div>
@@ -249,9 +266,9 @@
                         </div>
                     </div>
 
-                    <div class="col-2 volume ">
+                    <div class="col-2 volume">
                         <svg id="logo" xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor"
-                            class="bi bi-volume-up-fill " viewBox="0 0 16 16">
+                            class="bi bi-volume-up-fill" viewBox="0 0 16 16">
                             <path
                                 d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z" />
                             <path
@@ -301,6 +318,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Scripts -->
     <script>
         // Automatically submit a form whenever a volume is clicked
         document.querySelectorAll('.form-check-input').forEach(item => {
@@ -309,19 +328,16 @@
                 document.getElementById('volumeForm').submit();
             });
         });
-    </script>
-    <script>
+
         // Automatically submit the form whenever a new schedule is selected
-        document.querySelector('.scheduleSelector').addEventListener('change', function() {
+        document.querySelector('.scheduleSelector').addEventListener('change', function () {
             showLoading();
             document.getElementById('loadScheduleForm').submit();
         });
-    </script>
 
-    <script>
+        // Show loading overlay and disable buttons
         function showLoading() {
-            document.getElementById('loadingOverlay').style.display = 'flex'; // Show loading overlay
-            // Disable all buttons to prevent further clicks
+            document.getElementById('loadingOverlay').style.display = 'flex';
             document.querySelectorAll('button').forEach(button => {
                 button.disabled = true;
             });
@@ -331,7 +347,17 @@
         document.querySelectorAll('form').forEach(form => {
             form.onsubmit = showLoading;
         });
+
+        // Toggle the inline "Change Name" form
+        function toggleChangeNameForm() {
+            // Hide the "Change Name" button
+            document.getElementById('changeNameBtn').style.display = 'none';
+
+            // Show the inline form
+            document.getElementById('changeNameForm').style.display = 'block';
+        }
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
         crossorigin="anonymous"></script>
