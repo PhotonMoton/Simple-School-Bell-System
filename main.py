@@ -377,7 +377,8 @@ def name_schedule():
     schedule_name = f"schedule_{schedule_num}"
     new_schedule_name = request.form.get('name')
     change_schedule_name(schedule_name, new_schedule_name)
-    app_state['schedule_names']=load_schedule_names
+    app_state['schedule_names'] = load_schedule_names()
+    print(app_state['schedule_names'])
     return redirect(url_for('index', redirected=True))
 
 # Flask route to play youtube audio
