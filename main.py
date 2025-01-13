@@ -24,7 +24,7 @@ app_state = {
                 "error": [False, False], 
                 "volume": 75, 
                 "schedule":"1",
-                "schedule_names": load_schedule_names(), 
+                "sched_names": load_schedule_names(), 
                 "schedule_1":get_schedule("schedule_1.json"),
                 "schedule_2":get_schedule("schedule_2.json"), 
                 "schedule_3":get_schedule("schedule_3.json")
@@ -139,6 +139,7 @@ def index():
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
+    schedules.remove("sched_names")
 
     return render_template('index.html', app_state=app_state, schedules=schedules)
 
@@ -377,8 +378,7 @@ def name_schedule():
     schedule_name = f"schedule_{schedule_num}"
     new_schedule_name = request.form.get('name')
     change_schedule_name(schedule_name, new_schedule_name)
-    app_state['schedule_names'] = load_schedule_names()
-    print(app_state['schedule_names'])
+    app_state['sched_names'] = load_schedule_names()
     return redirect(url_for('index', redirected=True))
 
 # Flask route to play youtube audio

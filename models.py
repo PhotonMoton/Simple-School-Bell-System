@@ -127,9 +127,3 @@ def time_to_seconds(time_str):
     except ValueError:
         # Handle the case where the input time format is invalid
         return "error"
-
-# def play_audio_stream(url):
-#     player = vlc.MediaPlayer(url)
-#     player.play()
-#     time.sleep(45)  # Play for 45 seconds
-#     player.stop()

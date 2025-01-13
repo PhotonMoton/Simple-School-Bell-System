@@ -131,7 +131,7 @@
                                             {% set schedule_number = schedule_name.split('_')[1] %}
                                             <option value="{{ schedule_number }}" {{ 'selected' if
                                                 app_state["schedule"]==schedule_number else '' }}>
-                                                {{ app_state["schedule_names"][schedule_name] }}
+                                                {{ app_state["sched_names"][schedule_name] }}
                                             </option>
                                             {% endfor %}
                                         </select>
@@ -235,7 +235,7 @@
                 <div class="row">
                     <div class="col">
                         <p class="scheduleIndicator">
-                            {{ app_state["schedule_names"]["schedule_"+app_state["schedule"]] }} Loaded
+                            {{ app_state["sched_names"]["schedule_"+app_state["schedule"]] }} Loaded
                         </p>
                     </div>
                 </div>
