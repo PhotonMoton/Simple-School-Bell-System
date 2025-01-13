@@ -93,23 +93,8 @@ div{
     z-index: 1500;
 }
 
-#secondModal {
-    z-index: 1060; /* Higher than Bootstrap default for first modal (1050) */
-}
-.modal-backdrop.show {
-    z-index: 1055; /* Ensure backdrop for second modal appears above the first */
+#changeNameModal {
+    z-index: 1060; 
 }
 
-/* #musicPlayingOverlay{
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1500;
-} */
+
