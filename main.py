@@ -139,7 +139,6 @@ def index():
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
-    schedules.remove("sched_names")
 
     return render_template('index.html', app_state=app_state, schedules=schedules)
 
