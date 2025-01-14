@@ -1,5 +1,20 @@
 # Simple School Bell System (SSBS)
 
+## Table of Contents
+- [Introduction](#introduction)
+- [Interface](#interface)
+- [Getting Started](#getting-started)
+  - [Connect to Raspberry Pi](#connect-to-raspberry-pi)
+  - [Transfer or Download Files](#transfer-or-download-files)
+  - [Run School Bell Script](#run-school-bell-script)
+  - [Control User Interface](#control-user-interface)
+  - [Uploading a Bell Song](#uploading-a-bell-song)
+- [Stopping the Process](#stopping-the-process)
+- [Run on Boot](#run-on-boot)
+- [Future Updates](#future-updates)
+
+---
+
 ## Introduction
 
 This project is designed to automate the school bell system using a Raspberry Pi. It includes a Flask web application for controlling the bell schedule and managing bell songs. The system allows users to connect to the Raspberry Pi, run the school bell script, and control the user interface through a web browser.
@@ -19,6 +34,14 @@ This project is designed to automate the school bell system using a Raspberry Pi
 3. Clicking the `SCHEDULE` button will trigger a pop-up that will let you add and remove new time slots.  Clicking the dropdown will let you load a different schedule.  Here you can add a new schedule or delete the currently selected schedule.  The main page will let you know which Schedule is currently loaded.
 
    ![ssbs3](static/assets/ssbs3.png)
+
+4. If you want to create custom names for your schedules, You can do so for the current schedule by clicking the `Change Name` button.
+   
+   ![ssbs3](static/assets/sched_1.png)
+
+   Type in the name that you want and click `Confirm`.  Your custom name will now be displayed as loaded on the main page.
+
+   ![ssbs3](static/assets/sched_2.png)
 
 ## Getting Started
 
