@@ -243,4 +243,10 @@ Now, the School Bell Management System should automatically start on boot.
 
 1. Connect to an audio-clip api to facilitate song selection.  As of now you have to find and upload your own ".mp3" files.
 
-2. QOL
+2. Thread Locking
+
+3. Error Handling
+
+4. Unit Testing
+
+5. QOL

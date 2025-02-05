@@ -19,7 +19,8 @@ app_state = {
                 "daySong": 'test', 
                 "endSong": None, 
                 "app_state": 'test', 
-                "play_music":False, 
+                "play_music":False,
+                "test_running":False, 
                 "audio_state": False, 
                 "error": [False, False], 
                 "volume": 75, 
@@ -65,7 +66,7 @@ def update_app_state(subfolder, filename):
 
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
-    #Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
+    # Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     while not stop_event.is_set():
         current_time = datetime.now(pytz.timezone('US/Eastern')).strftime("%I:%M %p")
         schedule = app_state["schedule_"+app_state["schedule"]]
@@ -75,10 +76,32 @@ def start_audio_player(stop_event):
                 subfolder = 'day' if item['type'] == 'day' else 'end'
                 filename = app_state[subfolder + "Song"]
                 audio_url = get_full_file_path(subfolder, filename)
-                subprocess.run(["mpg123", audio_url])
+                process = subprocess.Popen(["mpg123", audio_url]) # Runs a subprocess that executes mpg123 on the audio set
                 app_state["play_music"] = True
-                wait_time = 60
-                time.sleep(wait_time)
+                start_time = time.time()
+                # Periodically check in on the process after it starts running
+                while True:
+                    time.sleep(0.1)
+                    # Stop the audio if the stop event is set
+                    if stop_event.is_set():
+                        process.terminate()
+                        process.wait()
+                        break
+
+                    # If mpg123 finished on its own, break
+                    if process.poll() is not None:
+                        break
+                    
+                    # Stop the process after a set time no matter what
+                    if time.time() - start_time >= 45 and item["type"] == 'day':
+                        process.terminate()
+                        process.wait()
+                        break
+                    elif time.time() - start_time >= 180 and item["type"] == 'end':
+                        process.terminate()
+                        process.wait()
+                        break
+
                 app_state["play_music"] = False
 
         time.sleep(5)
@@ -225,25 +248,27 @@ def stop():
 # Flask route for testing audio playback
 @app.route('/test', methods=['POST', 'GET'])
 def test():
-    #Tests the audio playback functionality independently of the scheduled playback
-    global app_state, audio_process
+    #Stops the audio playback process if it is running, signals to run a test of the audio, then resumes normal scheduled playback
+    global audio_process, stop_audio_event, app_state
 
-    was_running= True
-    # Start the audio process for testing if it's not already running
-    if audio_process is None or not audio_process.is_alive():
-        stop_audio_event.clear()  # Ensure any previous stop event is cleared
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
-        audio_process.start()
-        app_state["audio_state"] = True
-        was_running= False  
+    was_running = False
+    # Check if the audio process is running
+    if audio_process and audio_process.is_alive():
+        stop_audio_event.set()  # Signal the process to stop
+        audio_process.join()  # Wait for the process to finish
+        app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
+        was_running = True
 
     # Directly play the day song for testing
-    audio_url = get_full_file_path('day', app_state["daySong"])
-    subprocess.run(["mpg123", audio_url])
-    time.sleep(60)  # Wait for 60 seconds after playing the test audio
+    if app_state['test_running'] == False:
+        app_state['test_running']=True
+        audio_url = get_full_file_path('day', app_state["daySong"])
+        subprocess.Popen(["mpg123", audio_url])
+        time.sleep(45)  
+        
 
-    # Stop the audio process after testing
-    if was_running == False:
+    # Start the audio process after testing if it was running
+    if was_running == True:
         stop_audio_event.set()  # Signal the process to stop
         audio_process.join()  # Wait for the process to finish
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
