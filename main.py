@@ -67,40 +67,43 @@ def update_app_state(subfolder, filename):
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
     # Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
+    last_played_time = None
+
     while not stop_event.is_set():
         current_time = datetime.now(pytz.timezone('US/Eastern')).strftime("%I:%M %p")
         schedule = app_state["schedule_"+app_state["schedule"]]
+        if current_time != last_played_time:
+            for item in schedule:
+                if item['time'] == current_time:
+                    subfolder = 'day' if item['type'] == 'day' else 'end'
+                    filename = app_state[subfolder + "Song"]
+                    audio_url = get_full_file_path(subfolder, filename)
+                    process = subprocess.Popen(["mpg123", audio_url]) # Runs a subprocess that executes mpg123 on the audio set
+                    app_state["play_music"] = True
+                    last_played_time = current_time
+                    start_time = time.time()
+                    # Periodically check in on the process after it starts running
+                    while True:
+                        time.sleep(0.1)
+                        # Stop the audio if the stop event is set
+                        if stop_event.is_set():
+                            process.terminate()
+                            process.wait()
+                            break
 
-        for item in schedule:
-            if item['time'] == current_time:
-                subfolder = 'day' if item['type'] == 'day' else 'end'
-                filename = app_state[subfolder + "Song"]
-                audio_url = get_full_file_path(subfolder, filename)
-                process = subprocess.Popen(["mpg123", audio_url]) # Runs a subprocess that executes mpg123 on the audio set
-                app_state["play_music"] = True
-                start_time = time.time()
-                # Periodically check in on the process after it starts running
-                while True:
-                    time.sleep(0.1)
-                    # Stop the audio if the stop event is set
-                    if stop_event.is_set():
-                        process.terminate()
-                        process.wait()
-                        break
-
-                    # If mpg123 finished on its own, break
-                    if process.poll() is not None:
-                        break
-                    
-                    # Stop the process after a set time no matter what
-                    if time.time() - start_time >= 45 and item["type"] == 'day':
-                        process.terminate()
-                        process.wait()
-                        break
-                    elif time.time() - start_time >= 180 and item["type"] == 'end':
-                        process.terminate()
-                        process.wait()
-                        break
+                        # If mpg123 finished on its own, break
+                        if process.poll() is not None:
+                            break
+                        
+                        # Stop the process after a set time no matter what
+                        if time.time() - start_time >= 45 and item["type"] == 'day':
+                            process.terminate()
+                            process.wait()
+                            break
+                        elif time.time() - start_time >= 180 and item["type"] == 'end':
+                            process.terminate()
+                            process.wait()
+                            break
 
                 app_state["play_music"] = False
 
