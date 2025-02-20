@@ -71,11 +71,11 @@ def load_schedules():
 def get_schedule(schedule):
     # Check if the schedule file exists
     if not os.path.exists(schedule):
-        print(f"{file} doesn't exist creating new schedule")
+        print(f"{schedule} doesn't exist creating new schedule")
     # If not, create a new schedule and save it
         reset_schedule(schedule)
     with open(schedule, 'r') as file:
-       print(f"{file} exists. Loading schedule.")
+       print(f"{schedule} exists. Loading schedule.")
        return json.load(file)
 
 def reset_schedule(schedule):
