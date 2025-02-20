@@ -29,7 +29,6 @@ def create_schedule():
   return schedule
 
 def load_schedule_names():
-    print("loading")
     if not os.path.exists("sched_names.json"):
         print("creating file")
         with open("sched_names.json", 'w') as file:
@@ -40,8 +39,6 @@ def load_schedule_names():
                 }
             json.dump(schedule_names, file)
     with open("sched_names.json", 'r') as file:
-       print("file loaded")
-       print(file)
        return json.load(file)
 
 def change_schedule_name(schedule, new_name):
@@ -71,11 +68,13 @@ def load_schedules():
     return schedules
 
 def get_schedule(schedule):
-    # Check if the schedule.json file exists
+    # Check if the schedule file exists
     if not os.path.exists(schedule):
-    # If not, create a new schedule and save it to schedule.json
+        print(f"{file} doesn't exist creating new schedule")
+    # If not, create a new schedule and save it
         reset_schedule(schedule)
     with open(schedule, 'r') as file:
+       print(f"{file} exists. Loading schedule.")
        return json.load(file)
 
 def reset_schedule(schedule):
