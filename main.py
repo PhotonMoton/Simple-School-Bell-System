@@ -354,6 +354,26 @@ def remove_slot():
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
+# Flask route for removing multiple time slots
+@app.route('/remove-checked', methods=['POST', 'GET'])
+def remove_checked():
+    global app_state
+
+    if request.method == "POST":
+        option = "schedule_"+app_state["schedule"]
+        schedule = app_state[option]
+        slots = request.form.getlist("rmv_group[]")
+        for slot in slots:
+            time, type = slot.split("|")
+            to_delete = {"time":time, "type":type}
+            if to_delete in schedule:
+                schedule.remove(to_delete)
+        # Make necessary updates
+        app_state[option] = schedule
+        update_schedule(option+".json", schedule)
+        restart_audio_player()
+    return redirect(url_for('index', redirected=True))
+
 # Flask route for adding a new schedule
 @app.route('/add-schedule', methods=['POST'])
 def add_schedule():

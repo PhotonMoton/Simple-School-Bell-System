@@ -179,7 +179,7 @@
                                     {% for time_slot in app_state["schedule_"+app_state["schedule"]] %}
                                     <form action="/remove-slot" method="post">
                                         <div class="row">
-                                            <div class="col-10">
+                                            <div class="col-9">
                                                 <p class="schedule">TIME:
                                                     <span
                                                         style="color:blue;"><strong>{{time_slot["time"]}}</strong></span>
@@ -194,9 +194,24 @@
                                             <div class="col-2">
                                                 <button type="submit" class="btn btn-sm btn-danger">REMOVE</button>
                                             </div>
+                                            <!-- The checkbox for bulk removal (references the bulkRemoveForm below) -->
+                                            <div class="col-1">
+                                                <input 
+                                                    type="checkbox"
+                                                    class="slot-checkbox"
+                                                    name="rmv_group[]" 
+                                                    value="{{ time_slot['time'] }}|{{ time_slot['type'] }}"
+                                                    form="bulkRemoveForm"
+                                                >
+                                            </div>
                                         </div>
                                     </form>
                                     {% endfor %}
+                                    <form action="/remove-checked" method="post" id="bulkRemoveForm">
+                                        <button type="submit" class="btn btn-sm btn-danger" id="removeCheckedBtn" disabled>
+                                            REMOVE CHECKED
+                                        </button>
+                                    </form>
 
                                     <!-- Add new time slot -->
                                     <form action="/add-slot" method="post">
@@ -356,6 +371,17 @@
             // Show the inline form
             document.getElementById('changeNameForm').style.display = 'block';
         }
+
+        //Toggle REMOVE CHECKBOXES button
+        const checkboxes = document.querySelectorAll('.slot-checkbox');
+        const removeCheckedBtn = document.getElementById('removeCheckedBtn');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                // Enable button if at least one checkbox is checked
+                removeCheckedBtn.disabled = !Array.from(checkboxes).some(cb => cb.checked);
+            });
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
