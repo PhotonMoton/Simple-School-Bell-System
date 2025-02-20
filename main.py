@@ -138,7 +138,7 @@ def set_volume(volume):
 def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
-
+    print("index loaded")
     # Check if the request is redirected from an already running instance
     redirected = request.args.get('redirected', default=False, type=bool)
     if not redirected:
