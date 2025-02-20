@@ -75,8 +75,8 @@ def get_schedule(schedule):
     # If not, create a new schedule and save it
         reset_schedule(schedule)
     with open(schedule, 'r') as file:
-       print(f"{schedule} exists. Loading schedule.")
-       return json.load(file)
+        print(f"{schedule} exists. Loading schedule.")
+        return json.load(file)
 
 def reset_schedule(schedule):
     with open(schedule, 'w') as file:

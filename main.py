@@ -142,6 +142,7 @@ def index():
     # Check if the request is redirected from an already running instance
     redirected = request.args.get('redirected', default=False, type=bool)
     if not redirected:
+        print("initial load")
         # Determine paths for day and end song folders
         day_folder_path = os.path.join(app.root_path, 'static', 'day')
         end_folder_path = os.path.join(app.root_path, 'static', 'end')
