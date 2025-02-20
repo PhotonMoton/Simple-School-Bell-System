@@ -63,7 +63,7 @@ def load_schedules():
             try:
                 filename = filename.split('.')[0]
                 print("fetching schedules")
-                schedules[filename]=get_schedule(f"{filename}")
+                schedules[filename]=get_schedule(f"{filename}.json")
             except Exception as e:
                 print(f"Error adding {filename}: {e}")
     return schedules
