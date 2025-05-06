@@ -273,10 +273,12 @@ def test():
 
     # Start the audio process after testing if it was running
     if was_running == True:
-        stop_audio_event.set()  # Signal the process to stop
-        audio_process.join()  # Wait for the process to finish
-        app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
-
+        stop_audio_event.clear()  # Reset the stop event
+        # Create and start a new process for the audio player
+        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process.start()
+        app_state["audio_state"] = True 
+    app_state['test_running'] = False
     # Render and return the index page with the updated application state
     return redirect(url_for('index', redirected=True))
 
