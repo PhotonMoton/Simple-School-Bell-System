@@ -40,7 +40,7 @@
                             </div>
                             <div class="col-2">
                                 <select class="form-select" name="selectedOption" aria-label="day or end selector">
-                                    <option selected>day</option>
+                                    <option value="day" selected>day</option>
                                     <option value="end">end</option>
                                 </select>
                             </div>
@@ -54,7 +54,36 @@
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" placeholder="HH:MM:SS" aria-label="Time start."
                                     aria-describedby="button-addon2" name="start_time" id="start_time">
+                                <input type="hidden" name="bank" id="bankField" value="false">
                                 <button class="btn btn-primary" type="submit" id="button-addon2">Upload Song</button>
+                                <!-- Button to add song to the bank, sends the song as a 'file' and the song name as 'bank'. before upload opens a calendar to send a date named 'banked_date'-->
+                                <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#bankModal">
+                                    Add to Bank
+                                </button>
+                                <!-- Bank Modal -->
+                                <div class="modal" tabindex="-1" id="bankModal">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Bank Song</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="banked_date" class="form-label">Select Bank Date:</label>
+                                                    <input type="date" class="form-control" id="banked_date" name="banked_date" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button class="btn btn-secondary" type="submit" id="bankButton" onclick="document.getElementById('bankField').value='true'">
+                                                    Add to Bank
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>

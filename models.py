@@ -89,6 +89,38 @@ def delete_schedule(schedule):
     except Exception as e:
         print(f"Error deleting {schedule}: {e}")
 
+def set_bank(bank_songs):
+    with open("bank_songs.json", 'w') as file:
+        json.dump(bank_songs, file)
+
+def get_bank():
+    if not os.path.exists("bank_songs.json"):
+        print("creating bank file")
+        with open("bank_songs.json", 'w') as file:
+            json.dump([], file)
+    with open("bank_songs.json", 'r') as file:
+       return json.load(file)
+    
+def bank_date_check():
+    bank_songs = get_bank()
+    current_date = datetime.now().date()
+    for song in bank_songs:
+        if song['banked_date'] != "" and song['banked_date'] is not None:
+            try:
+                banked_date = datetime.strptime(song['banked_date'], '%Y-%m-%d').date()
+                if banked_date < current_date:
+                    bank_songs.remove(song)
+                    set_bank(bank_songs)
+            except ValueError:
+                print(f"Invalid date format for {song['filename']}: {song['banked_date']}")
+
+    
+
+# Function to get a list of files in a given folder
+def get_files_in_folder(folder_path):
+    #Returns a list of file names in the specified folder path. Returns an empty list if the folder does not exist
+    return [os.path.basename(file) for file in os.listdir(folder_path)] if os.path.exists(folder_path) else []
+
 def delete_files_in_folder(folder_path):
   # Get a list of all files in the folder
   files = os.listdir(folder_path)
@@ -102,13 +134,11 @@ def delete_files_in_folder(folder_path):
       except Exception as e:
           print(f"Error deleting {file_path}: {e}")
 
-
 # Edit a audio file to cut out a segment designated by a start and end time
 def cut_audio(file_path, start_time, end_time):
     audio = AudioSegment.from_file(file_path)
     new_audio = audio[start_time * 1000:end_time * 1000]
     new_audio.export(file_path, format="mp3")
-
 
 # Convert HH:MM:SS time format into seconds
 def time_to_seconds(time_str):
