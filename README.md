@@ -238,6 +238,15 @@ To ensure that the School Bell Management System runs automatically on boot, fol
 
 Now, the School Bell Management System should automatically start on boot.
 
+## Troubleshooting
+
+1. If you can't connect to your Raspberry Pi with admin@raspberrypi.local, try the following:
+    ```
+    admin@X.X.X.X
+    pi@X.X.X.X
+    *Replace the X's after the @ with your Raspberry Pi's ip adress
+    ```
+
 
 ## Future Updates
 
