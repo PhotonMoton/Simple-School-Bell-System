@@ -18,7 +18,7 @@ stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playbac
 app_state = {
                 "daySong": 'test', 
                 "endSong": None,
-                "bankSongs": get_files_in_folder(os.path.join(app.root_path, 'static', 'bank')),
+                "bankSongs": get_bank(),
                 "app_state": 'test', 
                 "play_music":False,
                 "test_running":False, 
@@ -151,9 +151,9 @@ def check_bank_songs():
                     # Move the banked song to the appropriate subfolder
                     os.replace(get_full_file_path('bank', filename), get_full_file_path(subfolder, filename))
                     # Remove the banked song from the bank and update the app state
-                    app_state['bankSongs'].remove(filename)
                     bank_songs.remove(song)
                     set_bank(bank_songs)
+                    app_state['bankSongs'] = bank_songs
                     update_app_state(subfolder, filename)
                     restart_audio_player()
 
@@ -260,10 +260,10 @@ def upload_file():
                     cut_audio(filename, start_time_seconds, end_time_seconds)
 
                 bank_dict = {"filename":clean_name, "subfolder":song_subfolder, "banked_date":banked_date}
-                app_state['bankSongs'].append(bank_dict["filename"])
                 bank_songs = get_bank()
                 bank_songs.append(bank_dict)
                 set_bank(bank_songs)
+                app_state["bankSongs"] = bank_songs
 
     return redirect(url_for('index', redirected=True))
 
@@ -479,6 +479,23 @@ def name_schedule():
     change_schedule_name(schedule_name, new_schedule_name)
     app_state['sched_names'] = load_schedule_names()
     return redirect(url_for('index', redirected=True))
+
+# Flask route for removing banked songs
+@app.route('/remove-bank-song', methods=['POST', 'GET'])
+def remove_banked():
+    global app_state
+    banked_songs = get_bank()
+    if request.method == "POST":
+        song_to_remove = request.form.get('song')
+        if song_to_remove in app_state["bankSongs"]:
+            for song in banked_songs:
+                if song['filename'] == song_to_remove:
+                    banked_songs.remove(song)
+                    break
+            set_bank(banked_songs)
+            app_state["bankSongs"] = banked_songs
+    return redirect(url_for('index', redirected=True))
+
 
 # # Flask route to play youtube audio
 # @app.route('/play', methods=['POST', 'GET'])

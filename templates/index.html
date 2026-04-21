@@ -141,7 +141,47 @@
                             data-bs-target="#scheduleModal">
                             SCHEDULE
                         </button>
+                        <!-- Button to open the BANK modal with a list of bank songs-->
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal"
+                            data-bs-target="#bankModal">
+                            BANK
+                        </button>
                     </div>
+                    <!-- BANK Modal -->
+                    <div class="modal" tabindex="-1" id="bankModal">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">BANK</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% for song in app_state["bankSongs"] %}
+                                    <form action="/remove-bank-song" method="post">
+                                        <input type="hidden" name="song" value="{{song['filename']}}">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                <p class="schedule">
+                                                    <span
+                                                        style="color:blue;"><strong>{{song['filename']}}</strong></span>
+                                                    PLAY DATE:
+                                                    <span
+                                                        style="color: brown;"><strong>{{song['banked_date']}}</strong></span>
+                                                </p>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="submit" class="btn btn-danger">Remove</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- SCHEDULE Modal -->
                     <div class="modal" tabindex="-1" id="scheduleModal">
                         <div class="modal-dialog modal-lg">
