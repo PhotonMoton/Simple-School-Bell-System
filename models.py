@@ -113,7 +113,7 @@ def bank_date_check():
                     set_bank(bank_songs)
             except ValueError:
                 print(f"Invalid date format for {song['filename']}: {song['banked_date']}")
-        if song['banked_date'] == "" and song['banked_date'] is None:
+        if song['banked_date'] == "" or song['banked_date'] is None:
             bank_songs.remove(song)
             set_bank(bank_songs)
 
