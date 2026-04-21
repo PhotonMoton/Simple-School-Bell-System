@@ -177,7 +177,6 @@ def index():
         # Update app state with the latest song files from each folder
         app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
         app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
-        app_state["bankSongs"] = get_files_in_folder(bank_folder_path) if os.path.exists(bank_folder_path) else None
 
         # Update app state with the latest user edited schedules
         app_state["schedule_1"] = get_schedule("schedule_1.json")

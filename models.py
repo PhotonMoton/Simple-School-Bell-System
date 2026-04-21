@@ -118,6 +118,17 @@ def bank_date_check():
             bank_songs.remove(song)
             set_bank(bank_songs)
             delete_banked_song(song['filename'])
+    banked_files = get_files_in_folder(os.path.join(os.getcwd(), 'bank_folder'))
+    is_file_banked = False
+    for file in banked_files:
+        for song in bank_songs:
+            if song['filename'] == file:
+                is_file_banked = True
+                break
+    if not is_file_banked:
+        delete_banked_song(file)
+
+
 
 def delete_banked_song(song_to_remove):
     file_path = os.path.join('bank_folder', song_to_remove)
