@@ -111,14 +111,22 @@ def bank_date_check():
                 if banked_date < current_date:
                     bank_songs.remove(song)
                     set_bank(bank_songs)
+                    delete_banked_song(song['filename'])
             except ValueError:
                 print(f"Invalid date format for {song['filename']}: {song['banked_date']}")
         if song['banked_date'] == "" or song['banked_date'] is None:
             bank_songs.remove(song)
             set_bank(bank_songs)
+            delete_banked_song(song['filename'])
 
+def delete_banked_song(song_to_remove):
+    file_path = os.path.join('bank_folder', song_to_remove)
+    try:
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+    except Exception as e:
+        print(f"Error deleting {file_path}: {e}")
     
-
 # Function to get a list of files in a given folder
 def get_files_in_folder(folder_path):
     #Returns a list of file names in the specified folder path. Returns an empty list if the folder does not exist
