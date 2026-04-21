@@ -483,18 +483,17 @@ def name_schedule():
 
 # Flask route for removing banked songs
 @app.route('/remove-bank-song', methods=['POST', 'GET'])
-def remove_banked():
+def remove_bank_song():
     global app_state
     banked_songs = get_bank()
     if request.method == "POST":
         song_to_remove = request.form.get('song')
-        if song_to_remove in app_state["bankSongs"]:
-            for song in banked_songs:
-                if song['filename'] == song_to_remove:
-                    banked_songs.remove(song)
-                    break
-            set_bank(banked_songs)
-            app_state["bankSongs"] = banked_songs
+        for song in banked_songs:
+            if song['filename'] == song_to_remove:
+                banked_songs.remove(song)
+                break
+        set_bank(banked_songs)
+        app_state["bankSongs"] = banked_songs
     return redirect(url_for('index', redirected=True))
 
 
