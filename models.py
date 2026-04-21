@@ -125,8 +125,8 @@ def bank_date_check():
             if song['filename'] == file:
                 is_file_banked = True
                 break
-    if not is_file_banked:
-        delete_banked_song(file)
+        if not is_file_banked:
+            delete_banked_song(file)
 
 
 
