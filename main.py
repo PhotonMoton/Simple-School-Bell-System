@@ -22,7 +22,8 @@ app_state = {
                 "app_state": 'test', 
                 "play_music":False,
                 "test_running":False, 
-                "audio_state": False, 
+                "audio_state": False,
+                "error_check": False,
                 "error": [False, False, False], 
                 "volume": 75, 
                 "schedule":"1",
@@ -192,6 +193,17 @@ def index():
             audio_process.start()
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
+
+
+    if app_state["error_check"] == True:
+        app_state["error"] = [False, False, False]
+
+    for error in app_state["error"]:
+        app_state["error_check"] = False
+        if error == True:
+            app_state["error_check"] = True
+            break
+        
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
     check_bank_songs()
     return render_template('index.html', app_state=app_state, schedules=schedules)

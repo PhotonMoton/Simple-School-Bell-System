@@ -11,6 +11,7 @@
   - [Uploading a Bell Song](#uploading-a-bell-song)
 - [Stopping the Process](#stopping-the-process)
 - [Run on Boot](#run-on-boot)
+- [Troubleshooting](#troubleshooting)
 - [Future Updates](#future-updates)
 
 ---
