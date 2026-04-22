@@ -23,8 +23,8 @@ app_state = {
                 "play_music":False,
                 "test_running":False, 
                 "audio_state": False,
-                "error_check": False,
-                "error": [False, False, False], 
+                "error_check": False, # Used to determine whether to check for errors or reset error notifications on the front end
+                "error": [False, False, False], # First value is whether there is a file type error, second value is whether there is a time format error, third value is whether there is a banked song conflict error
                 "volume": 75, 
                 "schedule":"1",
                 "sched_names": load_schedule_names(), 
@@ -194,15 +194,12 @@ def index():
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
 
-
-    if app_state["error_check"] == True:
+    if app_state["error_check"]:
         app_state["error"] = [False, False, False]
-
-    for error in app_state["error"]:
         app_state["error_check"] = False
-        if error == True:
+    else:
+        if any(app_state["error"]):
             app_state["error_check"] = True
-            break
         
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
     check_bank_songs()
