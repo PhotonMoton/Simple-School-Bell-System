@@ -223,21 +223,19 @@ def upload_file():
         # Reload page with an error notification if user input is not accepted
         base_file, extension = os.path.splitext(file.filename)
         if extension.lower() != ".mp3":
-            print(extension)
-            app_state["error"]= [True, False, False]
+            app_state["error"] = [True, False, False]
+            app_state["error_check"] = False
             return redirect(url_for('index', redirected=True))
-        
-        app_state["error"][0]= [False]
 
         if start_time_seconds == "error":
-            app_state["error"]= [False, True, False]
+            app_state["error"] = [False, True, False]
+            app_state["error_check"] = False
             return redirect(url_for('index', redirected=True))
-
-        app_state["error"][1]= [False]
 
         for song in get_bank():
             if song['banked_date'] == banked_date and song['subfolder'] == song_subfolder:
                 app_state["error"] = [False, False, True]
+                app_state["error_check"] = False
                 return redirect(url_for('index', redirected=True))
         
         app_state["error"]= [False, False, False]
