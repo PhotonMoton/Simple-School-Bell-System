@@ -128,8 +128,6 @@ def bank_date_check():
         if not is_file_banked:
             delete_banked_song(file)
 
-
-
 def delete_banked_song(song_to_remove):
     file_path = os.path.join('bank_folder', song_to_remove)
     try:
