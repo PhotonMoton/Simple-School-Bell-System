@@ -117,6 +117,9 @@
                         {% if app_state["error"][1] %}
                         <div class="error">"Invalid time format. Please enter the time in HH:MM:SS format."</div>
                         {% endif %}
+                        {% if app_state["error"][2] %}
+                        <div class="error">"A song is already banked for that date and type. Please choose a different date or type, or remove the existing banked song."</div>
+                        {% endif %}
                     </div>
                 </div>
 

@@ -23,7 +23,7 @@ app_state = {
                 "play_music":False,
                 "test_running":False, 
                 "audio_state": False, 
-                "error": [False, False], 
+                "error": [False, False, False], 
                 "volume": 75, 
                 "schedule":"1",
                 "sched_names": load_schedule_names(), 
@@ -202,7 +202,7 @@ def upload_file():
     #Handles file uploads, updates app state, and initiates audio processing for uploaded files
     global app_state, stop_audio_event, audio_process
 
-    app_state["error"]= [False, False]
+    app_state["error"]= [False, False, False]
 
     if request.method == 'POST':
         file = request.files.get('file')
@@ -223,8 +223,15 @@ def upload_file():
         if start_time_seconds == "error":
             app_state["error"][1] = True
             return redirect(url_for('index', redirected=True))
+
+        app_state["error"][1]= [False]
+
+        for song in get_bank():
+            if song['banked_date'] == banked_date and song['subfolder'] == song_subfolder:
+                app_state["error"][2] = True
+                return redirect(url_for('index', redirected=True))
         
-        app_state["error"]= [False, False]
+        app_state["error"]= [False, False, False]
         end_time_seconds = start_time_seconds + 45
         if banking == "false":
             if file:
