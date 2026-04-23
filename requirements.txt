@@ -15,7 +15,6 @@ Jinja2==3.1.6
 jsonpatch==1.33
 jsonpointer==3.0.0
 MarkupSafe==3.0.3
-numpy==2.1.2
 pydub==0.25.1
 python-engineio==4.13.1
 python-socketio==5.16.1
