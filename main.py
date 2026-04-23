@@ -337,6 +337,9 @@ def test():
     if app_state['test_running'] == False:
         app_state['test_running']=True
         audio_url = get_full_file_path('day', app_state["daySong"])
+        socketio.emit('play_audio', {
+            'url': f'/static/day/{app_state["daySong"]}'
+        })
         subprocess.Popen(["mpg123", audio_url])
         time.sleep(45)  
         
