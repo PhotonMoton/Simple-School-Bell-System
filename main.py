@@ -7,11 +7,11 @@ import pytz  # For timezone conversions
 import time  # For sleep/delay operations
 import os  # For file system operations
 import re # For sanitizing filenames
-
+from flask_socketio import SocketIO, emit
 
 # Initialize Flask app with a specific static_url_path
 app = Flask(__name__, static_url_path='/static')
-
+socketio = SocketIO(app, async_mode='threading')
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
 stop_audio_event = threading.Event()  # Event signal to stop audio playback
@@ -80,6 +80,11 @@ def start_audio_player(stop_event):
                     filename = app_state[subfolder + "Song"]
                     audio_url = get_full_file_path(subfolder, filename)
                     process = subprocess.Popen(["mpg123", audio_url]) # Runs a subprocess that executes mpg123 on the audio set
+                    socketio.emit('play_audio', {
+                        'url': f'/static/{subfolder}/{filename}',
+                        # --Pass any additional data you want to send to the client here--
+                        # 'type': item['type']
+                    })
                     app_state["play_music"] = True
                     last_played_time = current_time
                     start_time = time.time()
@@ -519,6 +524,14 @@ def remove_bank_song():
 #     play_audio_stream(audio_url)
 #     return redirect(url_for('index', redirected=True))
 
+# SocketIO event handlers for client connections and disconnections
+@socketio.on('connect')
+def handle_connect():
+    print('Listener connected', flush=True)
+
+@socketio.on('disconnect')
+def handle_disconnect(reason):
+    print(f'Listener disconnected: {reason}', flush=True)
 # Main block to run the Flask application on a specified host and port
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    socketio.run(app, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True)
