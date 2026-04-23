@@ -2,7 +2,7 @@ import subprocess  # For executing shell commands
 from flask import Flask, render_template, request, redirect, url_for  # Flask web framework imports
 from models import get_bank, bank_date_check, set_bank, delete_files_in_folder, load_schedules, create_schedule, cut_audio, time_to_seconds, get_schedule, update_schedule, reset_schedule, delete_schedule, load_schedule_names, change_schedule_name, get_files_in_folder
 from datetime import datetime  # For handling date and time operations
-import multiprocessing  # For parallel execution
+import threading  # For parallel execution
 import pytz  # For timezone conversions
 import time  # For sleep/delay operations
 import os  # For file system operations
@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 
 # Initialize variables for managing audio processes and app state
 audio_process = None  # Placeholder for the audio playing process
-stop_audio_event = multiprocessing.Event()  # Event signal to stop audio playback
+stop_audio_event = threading.Event()  # Event signal to stop audio playback
 app_state = {
                 "daySong": 'test', 
                 "endSong": None,
@@ -121,7 +121,7 @@ def restart_audio_player():
         stop_audio_event.clear()  # Reset the event for next use
         
         # Start a new audio process with the updated state
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True  # Ensure the audio state is marked as running
     else:
@@ -189,7 +189,7 @@ def index():
         # Start audio process if it's not already running
         if audio_process is None:
             stop_audio_event.clear()
-            audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+            audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
             audio_process.start()
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
@@ -292,7 +292,7 @@ def start():
     if audio_process is None or not audio_process.is_alive():
         stop_audio_event.clear()  # Reset the stop event
         # Create and start a new process for the audio player
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True  
 
@@ -340,7 +340,7 @@ def test():
     if was_running == True:
         stop_audio_event.clear()  # Reset the stop event
         # Create and start a new process for the audio player
-        audio_process = multiprocessing.Process(target=start_audio_player, args=(stop_audio_event,))
+        audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True 
     app_state['test_running'] = False
