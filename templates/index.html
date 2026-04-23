@@ -499,12 +499,6 @@
                     console.error('Audio play failed:', err);
                 });
             });
-            // Trigger a play on the audio element during this user gesture
-            // to unlock it for future plays
-            const audio = document.getElementById('bellAudio');
-            audio.play().then(function() {
-                audio.pause();
-            }).catch(function() {});
         }
     </script>
 
