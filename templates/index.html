@@ -472,6 +472,19 @@
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+            
+            // Workaround for iOS Safari autoplay restrictions: play a silent audio to unlock the audio system
+            var audio = document.getElementById('bellAudio');
+            audio.src = '/static/day/{{ app_state["daySong"] }}';
+            audio.load();
+            audio.volume = 0;
+            audio.play().then(function() {
+                audio.pause();
+                audio.currentTime = 0;
+                audio.volume = 1;
+            }).catch(function() {
+                audio.volume = 1;
+            });
 
             socket = io();
             // Handle connection status updates and UI changes
