@@ -72,6 +72,10 @@ def start_audio_player(stop_event):
         # Run a check to replace the current song with a banked song if the banked song's date matches the current date.  Only checks once a day at 7 AM.
         if current_time == "07:00 AM" and last_played_time != current_time:
             check_bank_songs()
+            # Check to see if it is monday morning at 7:00 AM, and if so, reset the current schedule to the default
+            if datetime.now(pytz.timezone('US/Eastern')).weekday() == 0:
+                app_state["schedule"] = "1"
+                restart_audio_player()
 
         if current_time != last_played_time:
             for item in schedule:
@@ -198,7 +202,7 @@ def index():
             audio_process.start()
             app_state["audio_state"] = True
             set_volume(app_state['volume'])
-
+    # Handle error notifications for redirected requests and reset error state if necessary
     if app_state["error_check"]:
         app_state["error"] = [False, False, False]
         app_state["error_check"] = False
