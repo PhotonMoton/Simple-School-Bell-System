@@ -58,11 +58,13 @@ def get_full_file_path(subfolder, filename):
 
 # Function to update the application state with the current song based on the subfolder and filename
 def update_app_state(subfolder, filename):
+    global app_state
     #Updates the app_state dictionary with the filename of the current song, based on the subfolder
     app_state[subfolder + "Song"] = filename
 
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
+    global app_state
     # Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     last_played_time = None
 
@@ -71,10 +73,12 @@ def start_audio_player(stop_event):
         schedule = app_state["schedule_"+app_state["schedule"]]
         # Run a check to replace the current song with a banked song if the banked song's date matches the current date.  Only checks once a day at 7 AM.
         if current_time == "07:00 AM" and last_played_time != current_time:
+            print("Running daily bank check")
             check_bank_songs()
             # Check to see if it is monday morning at 7:00 AM, and if so, reset the current schedule to the default
             if datetime.now(pytz.timezone('US/Eastern')).weekday() == 0:
                 app_state["schedule"] = "1"
+                print("Resetting schedule for new week")
                 restart_audio_player()
 
         if current_time != last_played_time:
@@ -521,6 +525,12 @@ def remove_bank_song():
         set_bank(banked_songs)
         app_state["bankSongs"] = banked_songs
     return redirect(url_for('index', redirected=True))
+
+
+# display a hello screen
+@app.route('/hello')
+def hello():
+    return "Hello, World!"
 
 
 # # Flask route to play youtube audio
