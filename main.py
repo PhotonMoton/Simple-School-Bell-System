@@ -58,13 +58,13 @@ def get_full_file_path(subfolder, filename):
 
 # Function to update the application state with the current song based on the subfolder and filename
 def update_app_state(subfolder, filename):
-    global app_state
+    
     #Updates the app_state dictionary with the filename of the current song, based on the subfolder
     app_state[subfolder + "Song"] = filename
 
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
-    global app_state
+    
     # Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     last_played_time = None
 
