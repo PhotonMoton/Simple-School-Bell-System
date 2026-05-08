@@ -187,7 +187,6 @@ def index():
     #Handles the index route, initializes the audio process if not already running, and renders the index page with the current app state
     global audio_process, stop_audio_event, app_state
     print("index loaded", flush=True)
-    print(app_state, flush=True)
     check_bank_songs()
     # Check if the request is redirected from an already running instance
     redirected = request.args.get('redirected', default=False, type=bool)
@@ -236,6 +235,7 @@ def index():
         
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
     check_bank_songs()
+    print(f"Rendering index with app_state: {app_state}", flush=True)
     return render_template('index.html', app_state=app_state, schedules=schedules)
 
 # Flask route for uploading files
