@@ -58,13 +58,14 @@ def get_full_file_path(subfolder, filename):
 
 # Function to update the application state with the current song based on the subfolder and filename
 def update_app_state(subfolder, filename):
-    
+    global app_state
     #Updates the app_state dictionary with the filename of the current song, based on the subfolder
     app_state[subfolder + "Song"] = filename
+    print(f"app_state['{subfolder}Song'] changed to: {filename}", flush=True)
 
 # Function to start the audio player in a separate process
 def start_audio_player(stop_event):
-    
+    global app_state
     # Continuously plays audio based on the current time and a predefined schedule, until the stop_event is set
     last_played_time = None
 
@@ -73,15 +74,17 @@ def start_audio_player(stop_event):
         schedule = app_state["schedule_"+app_state["schedule"]]
         # Run a check to replace the current song with a banked song if the banked song's date matches the current date.  Only checks once a day at 7 AM.
         if current_time == "07:00 AM" and last_played_time != current_time:
-            print("Running daily bank check")
+            print("Running daily bank check", flush=True)
             check_bank_songs()
             # Check to see if it is monday morning at 7:00 AM, and if so, reset the current schedule to the default
             if datetime.now(pytz.timezone('US/Eastern')).weekday() == 0:
                 app_state["schedule"] = "1"
-                print("Resetting schedule for new week")
+                print("app_state['schedule'] changed to: '1' (weekly reset)", flush=True)
+                print("Resetting schedule for new week", flush=True)
                 restart_audio_player()
-
+        # Only play audio if the current time matches a time in the schedule and it hasn't already played for that time slot
         if current_time != last_played_time:
+            # Loop through the schedule to find any time slots that match the current time, and play the corresponding audio if there is a match
             for item in schedule:
                 if item['time'] == current_time:
                     subfolder = 'day' if item['type'] == 'day' else 'end'
@@ -94,6 +97,7 @@ def start_audio_player(stop_event):
                         # 'type': item['type']
                     })
                     app_state["play_music"] = True
+                    print(f"app_state['play_music'] changed to: True", flush=True)
                     last_played_time = current_time
                     start_time = time.time()
                     # Periodically check in on the process after it starts running
@@ -119,7 +123,9 @@ def start_audio_player(stop_event):
                             process.wait()
                             break
 
-                app_state["play_music"] = False
+                    app_state["play_music"] = False
+                    print(f"app_state['play_music'] changed to: False", flush=True)
+                    break
 
         time.sleep(5)
 
@@ -137,10 +143,12 @@ def restart_audio_player():
         audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True  # Ensure the audio state is marked as running
+        print(f"app_state['audio_state'] changed to: True (restart)", flush=True)
     else:
         # If not running, just update the state without starting the process
         # This is useful when the application is in a stopped state
         app_state["audio_state"] = False  # Ensure the audio state is marked as not running
+        print(f"app_state['audio_state'] changed to: False (not running)", flush=True)
 
 # Function to set the volume of the system using amixer
 def set_volume(volume):
@@ -168,6 +176,8 @@ def check_bank_songs():
                     bank_songs.remove(song)
                     set_bank(bank_songs)
                     app_state['bankSongs'] = bank_songs
+                    print(f"app_state['bankSongs'] changed to: {bank_songs} (bank check)", flush=True)
+                    print(f"Bank Check: Replaced {subfolder} song with banked song: {filename}", flush=True)
                     update_app_state(subfolder, filename)
                     restart_audio_player()
 
@@ -190,14 +200,20 @@ def index():
 
         # Update app state with the latest song files from each folder
         app_state["daySong"] = get_files_in_folder(day_folder_path)[-1] if os.path.exists(day_folder_path) else None
+        print(f"app_state['daySong'] changed to: {app_state['daySong']} (initial load)", flush=True)
         app_state["endSong"] = get_files_in_folder(end_folder_path)[-1] if os.path.exists(end_folder_path) else None
+        print(f"app_state['endSong'] changed to: {app_state['endSong']} (initial load)", flush=True)
 
         # Update app state with the latest user edited schedules
         app_state["schedule_1"] = get_schedule("schedule_1.json")
+        print(f"app_state['schedule_1'] changed to: {app_state['schedule_1']} (initial load)", flush=True)
         app_state["schedule_2"] = get_schedule("schedule_2.json")
+        print(f"app_state['schedule_2'] changed to: {app_state['schedule_2']} (initial load)", flush=True)
         app_state["schedule_3"] = get_schedule("schedule_3.json")
+        print(f"app_state['schedule_3'] changed to: {app_state['schedule_3']} (initial load)", flush=True)
         for key, value in load_schedules().items():
             app_state[key] = value
+            print(f"app_state['{key}'] changed to: {value} (load_schedules)", flush=True)
 
         # Start audio process if it's not already running
         if audio_process is None:
@@ -205,14 +221,18 @@ def index():
             audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
             audio_process.start()
             app_state["audio_state"] = True
+            print(f"app_state['audio_state'] changed to: True (initial start)", flush=True)
             set_volume(app_state['volume'])
     # Handle error notifications for redirected requests and reset error state if necessary
     if app_state["error_check"]:
         app_state["error"] = [False, False, False]
+        print(f"app_state['error'] changed to: [False, False, False] (error_check reset)", flush=True)
         app_state["error_check"] = False
+        print(f"app_state['error_check'] changed to: False", flush=True)
     else:
         if any(app_state["error"]):
             app_state["error_check"] = True
+            print(f"app_state['error_check'] changed to: True", flush=True)
         
     schedules = [key for key in app_state.keys() if key.startswith('schedule_')]
     check_bank_songs()
@@ -225,6 +245,7 @@ def upload_file():
     global app_state, stop_audio_event, audio_process
 
     app_state["error"]= [False, False, False]
+    print(f"app_state['error'] changed to: [False, False, False] (upload entry)", flush=True)
 
     if request.method == 'POST':
         file = request.files.get('file')
@@ -237,21 +258,28 @@ def upload_file():
         base_file, extension = os.path.splitext(file.filename)
         if extension.lower() != ".mp3":
             app_state["error"] = [True, False, False]
+            print(f"app_state['error'] changed to: [True, False, False] (file type error)", flush=True)
             app_state["error_check"] = False
+            print(f"app_state['error_check'] changed to: False", flush=True)
             return redirect(url_for('index', redirected=True))
 
         if start_time_seconds == "error":
             app_state["error"] = [False, True, False]
+            print(f"app_state['error'] changed to: [False, True, False] (time format error)", flush=True)
             app_state["error_check"] = False
+            print(f"app_state['error_check'] changed to: False", flush=True)
             return redirect(url_for('index', redirected=True))
 
         for song in get_bank():
             if song['banked_date'] == banked_date and song['subfolder'] == song_subfolder:
                 app_state["error"] = [False, False, True]
+                print(f"app_state['error'] changed to: [False, False, True] (bank conflict error)", flush=True)
                 app_state["error_check"] = False
+                print(f"app_state['error_check'] changed to: False", flush=True)
                 return redirect(url_for('index', redirected=True))
         
         app_state["error"]= [False, False, False]
+        print(f"app_state['error'] changed to: [False, False, False] (validation passed)", flush=True)
         end_time_seconds = start_time_seconds + 45
         if banking == "false":
             if file:
@@ -292,6 +320,7 @@ def upload_file():
                 bank_songs.append(bank_dict)
                 set_bank(bank_songs)
                 app_state["bankSongs"] = bank_songs
+                print(f"app_state['bankSongs'] changed to: {bank_songs} (new bank upload)", flush=True)
 
     return redirect(url_for('index', redirected=True))
 
@@ -308,6 +337,7 @@ def start():
         audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True  
+        print(f"app_state['audio_state'] changed to: True (manual start)", flush=True)
 
     # Render and return the index page with the updated application state
     return redirect(url_for('index', redirected=True))
@@ -323,6 +353,7 @@ def stop():
         stop_audio_event.set()  # Signal the process to stop
         audio_process.join()  # Wait for the process to finish
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
+        print(f"app_state['audio_state'] changed to: False (manual stop)", flush=True)
 
     # Render and return the index page with the updated application state
     return redirect(url_for('index', redirected=True))
@@ -339,11 +370,13 @@ def test():
         stop_audio_event.set()  # Signal the process to stop
         audio_process.join()  # Wait for the process to finish
         app_state["audio_state"] = False  # Update the app state to indicate audio is not playing
+        print(f"app_state['audio_state'] changed to: False (test stop)", flush=True)
         was_running = True
 
     # Directly play the day song for testing
     if app_state['test_running'] == False:
         app_state['test_running']=True
+        print(f"app_state['test_running'] changed to: True", flush=True)
         audio_url = get_full_file_path('day', app_state["daySong"])
         socketio.emit('play_audio', {
             'url': f'/static/day/{app_state["daySong"]}'
@@ -359,7 +392,9 @@ def test():
         audio_process = threading.Thread(target=start_audio_player, args=(stop_audio_event,), daemon=True)
         audio_process.start()
         app_state["audio_state"] = True 
+        print(f"app_state['audio_state'] changed to: True (test restart)", flush=True)
     app_state['test_running'] = False
+    print(f"app_state['test_running'] changed to: False", flush=True)
     # Render and return the index page with the updated application state
     return redirect(url_for('index', redirected=True))
 
@@ -371,6 +406,7 @@ def volume():
     if request.method == 'POST':
         new_volume = int(request.form.get('volume'))
         app_state['volume']=new_volume
+        print(f"app_state['volume'] changed to: {new_volume}", flush=True)
         set_volume(new_volume)
     return redirect(url_for('index', redirected=True))
 
@@ -412,6 +448,7 @@ def add_slot():
 
         # Make necessary updates
         app_state[option] = schedule
+        print(f"app_state['{option}'] changed to: {schedule} (slot added)", flush=True)
         update_schedule(option+".json", schedule)
         restart_audio_player()
 
@@ -433,6 +470,7 @@ def remove_slot():
 
         # Make necessary updates
         app_state[option] = schedule
+        print(f"app_state['{option}'] changed to: {schedule} (slot removed)", flush=True)
         update_schedule(option+".json", schedule)
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
@@ -453,6 +491,7 @@ def remove_checked():
                 schedule.remove(to_delete)
         # Make necessary updates
         app_state[option] = schedule
+        print(f"app_state['{option}'] changed to: {schedule} (checked slots removed)", flush=True)
         update_schedule(option+".json", schedule)
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
@@ -469,9 +508,11 @@ def add_schedule():
     # Create the new schedule key
     schedule_key = f"schedule_{next_schedule_number}"
     app_state[schedule_key] = get_schedule(f"{schedule_key}.json")
+    print(f"app_state['{schedule_key}'] changed to: {app_state[schedule_key]} (new schedule created)", flush=True)
 
     # Update current schedule
     app_state["schedule"] = str(next_schedule_number)
+    print(f"app_state['schedule'] changed to: '{next_schedule_number}' (switched to new schedule)", flush=True)
     restart_audio_player()
 
     return redirect(url_for('index', redirected=True))
@@ -486,7 +527,9 @@ def remove_schedule():
     if schedule > 3:
         delete_schedule(schedule_filename)
         app_state.pop(f"schedule_{schedule}")
+        print(f"app_state['schedule_{schedule}'] removed (schedule deleted)", flush=True)
         app_state["schedule"] = "1"
+        print(f"app_state['schedule'] changed to: '1' (fallback after delete)", flush=True)
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
 
@@ -497,6 +540,7 @@ def load_schedule():
 
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
+        print(f"app_state['schedule'] changed to: '{app_state['schedule']}' (manual load)", flush=True)
         restart_audio_player()
     return redirect(url_for('index', redirected=True))
     
@@ -509,6 +553,7 @@ def name_schedule():
     new_schedule_name = request.form.get('name')
     change_schedule_name(schedule_name, new_schedule_name)
     app_state['sched_names'] = load_schedule_names()
+    print(f"app_state['sched_names'] changed to: {app_state['sched_names']} (name changed)", flush=True)
     return redirect(url_for('index', redirected=True))
 
 # Flask route for removing banked songs
@@ -524,6 +569,7 @@ def remove_bank_song():
                 break
         set_bank(banked_songs)
         app_state["bankSongs"] = banked_songs
+        print(f"app_state['bankSongs'] changed to: {banked_songs} (bank song removed)", flush=True)
     return redirect(url_for('index', redirected=True))
 
 
