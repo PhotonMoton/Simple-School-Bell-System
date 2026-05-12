@@ -100,7 +100,10 @@ def get_bank():
             json.dump([], file)
     with open("bank_songs.json", 'r') as file:
        return json.load(file)
-    
+
+# Check the bank for any songs that have a banked date that has passed, and remove them from the bank and delete the corresponding file. 
+# Also checks for any songs in the bank that don't have a banked date and removes them as well. 
+# Finally, checks for any files in the bank folder that aren't in the bank and deletes them.
 def bank_date_check():
     bank_songs = get_bank()
     current_date = datetime.now().date()

@@ -79,9 +79,10 @@ def start_audio_player(stop_event):
             # Check to see if it is monday morning at 7:00 AM, and if so, reset the current schedule to the default
             if datetime.now(pytz.timezone('US/Eastern')).weekday() == 0:
                 app_state["schedule"] = "1"
-                print("app_state['schedule'] changed to: '1' (weekly reset)", flush=True)
+                last_played_time = None
                 print("Resetting schedule for new week", flush=True)
-                restart_audio_player()
+                print("app_state['schedule'] changed to: '1' (weekly reset)", flush=True)
+                
         # Only play audio if the current time matches a time in the schedule and it hasn't already played for that time slot
         if current_time != last_played_time:
             # Loop through the schedule to find any time slots that match the current time, and play the corresponding audio if there is a match
@@ -129,7 +130,7 @@ def start_audio_player(stop_event):
 
         time.sleep(5)
 
-# Function to restart the audio player process
+# Function to restart the audio player process (not currently used, but useful for future features such as a manual "refresh audio" button on the front end)
 def restart_audio_player():
     global audio_process, stop_audio_event, app_state
     # Check if the audio process is currently running
@@ -179,7 +180,7 @@ def check_bank_songs():
                     print(f"app_state['bankSongs'] changed to: {bank_songs} (bank check)", flush=True)
                     print(f"Bank Check: Replaced {subfolder} song with banked song: {filename}", flush=True)
                     update_app_state(subfolder, filename)
-                    restart_audio_player()
+                    
 
 # Flask route for the index page
 @app.route('/', methods=['POST', 'GET'])
@@ -297,7 +298,7 @@ def upload_file():
                     cut_audio(filename, start_time_seconds, end_time_seconds)
 
                 update_app_state(song_subfolder, os.path.basename(filename))
-                restart_audio_player()
+                
                 return redirect(url_for('index', redirected=True))
         else:
             if file:
@@ -450,7 +451,7 @@ def add_slot():
         app_state[option] = schedule
         print(f"app_state['{option}'] changed to: {schedule} (slot added)", flush=True)
         update_schedule(option+".json", schedule)
-        restart_audio_player()
+        
 
     return redirect(url_for('index', redirected=True))
 
@@ -472,7 +473,7 @@ def remove_slot():
         app_state[option] = schedule
         print(f"app_state['{option}'] changed to: {schedule} (slot removed)", flush=True)
         update_schedule(option+".json", schedule)
-        restart_audio_player()
+        
     return redirect(url_for('index', redirected=True))
 
 # Flask route for removing multiple time slots
@@ -493,7 +494,7 @@ def remove_checked():
         app_state[option] = schedule
         print(f"app_state['{option}'] changed to: {schedule} (checked slots removed)", flush=True)
         update_schedule(option+".json", schedule)
-        restart_audio_player()
+        
     return redirect(url_for('index', redirected=True))
 
 # Flask route for adding a new schedule
@@ -513,7 +514,7 @@ def add_schedule():
     # Update current schedule
     app_state["schedule"] = str(next_schedule_number)
     print(f"app_state['schedule'] changed to: '{next_schedule_number}' (switched to new schedule)", flush=True)
-    restart_audio_player()
+    
 
     return redirect(url_for('index', redirected=True))
 
@@ -530,7 +531,7 @@ def remove_schedule():
         print(f"app_state['schedule_{schedule}'] removed (schedule deleted)", flush=True)
         app_state["schedule"] = "1"
         print(f"app_state['schedule'] changed to: '1' (fallback after delete)", flush=True)
-        restart_audio_player()
+        
     return redirect(url_for('index', redirected=True))
 
 # Flask route for changing the current loaded schedule
@@ -541,7 +542,7 @@ def load_schedule():
     if request.method == "POST":
         app_state["schedule"] = request.form.get('option')
         print(f"app_state['schedule'] changed to: '{app_state['schedule']}' (manual load)", flush=True)
-        restart_audio_player()
+        
     return redirect(url_for('index', redirected=True))
     
 # Flask route for changing the schedule name
